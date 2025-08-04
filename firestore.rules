@@ -1,0 +1,24 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Tasks collection - cho phép tất cả operations trong development
+    match /tasks/{taskId} {
+      allow read, write: if true; // Allow all operations for development
+    }
+    
+    // Events collection - cho phép tất cả operations trong development
+    match /events/{eventId} {
+      allow read, write: if true; // Allow all operations for development
+    }
+    
+    // Users collection - cho phép tất cả operations trong development
+    match /users/{userId} {
+      allow read, write: if true; // Allow all operations for development
+    }
+    
+    // Subjects collection - cho phép tất cả operations trong development
+    match /subjects/{subjectId} {
+      allow read, write: if true; // Allow all operations for development
+    }
+  }
+} 
