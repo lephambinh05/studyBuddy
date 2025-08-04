@@ -1,44 +1,55 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart'; // Import kDebugMode
 import '../../firebase_options.dart';
 
 class FirebaseService {
   static FirebaseFirestore? _firestore;
-  
+
   // Khởi tạo Firebase
   static Future<void> initializeFirebase() async {
     try {
+      print('🔄 FirebaseService: Bắt đầu khởi tạo Firebase...');
+      
+      // Kiểm tra xem Firebase đã được khởi tạo chưa
+      if (Firebase.apps.isNotEmpty) {
+        print('✅ Firebase đã được khởi tạo trước đó');
+        _firestore = FirebaseFirestore.instance;
+        return;
+      }
+      
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
-      
+
       _firestore = FirebaseFirestore.instance;
-      
+
       // Cấu hình Firestore settings cho development
       _firestore!.settings = const Settings(
         persistenceEnabled: true,
         cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
         sslEnabled: true,
       );
-      
+
       print("✅ Firebase đã được khởi tạo thành công");
       print("📊 Firebase project: ${_firestore!.app.name}");
       print("📊 Firestore instance: ${_firestore!.app.options.projectId}");
-      
+
       // Test connection
       try {
         await _firestore!.collection('tasks').limit(1).get();
         print("✅ Firestore connection test thành công");
       } catch (e) {
         print("❌ Firestore connection test failed: $e");
+        // Don't rethrow, just log the error
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       print("❌ Lỗi khởi tạo Firebase: $e");
-      rethrow;
+      print("❌ Stack trace: $stackTrace");
+      // Don't rethrow, let the app continue without Firebase
     }
   }
-  
+
   // Get Firestore instance
   static FirebaseFirestore get firestore {
     if (_firestore == null) {
@@ -46,7 +57,7 @@ class FirebaseService {
     }
     return _firestore!;
   }
-  
+
   // Kiểm tra kết nối
   static Future<bool> checkConnection() async {
     try {
@@ -57,14 +68,14 @@ class FirebaseService {
       return false;
     }
   }
-  
+
   // Backup data
   static Future<Map<String, dynamic>> backupData() async {
     try {
       final tasks = await _firestore!.collection('tasks').get();
       final events = await _firestore!.collection('events').get();
       final users = await _firestore!.collection('users').get();
-      
+
       return {
         'tasks': tasks.docs.map((doc) => doc.data()).toList(),
         'events': events.docs.map((doc) => doc.data()).toList(),
@@ -76,32 +87,32 @@ class FirebaseService {
       rethrow;
     }
   }
-  
+
   // Restore data
   static Future<void> restoreData(Map<String, dynamic> backup) async {
     try {
       final batch = _firestore!.batch();
-      
+
       // Restore tasks
       for (final task in backup['tasks']) {
         final docRef = _firestore!.collection('tasks').doc();
         batch.set(docRef, task);
       }
-      
+
       // Restore events
       for (final event in backup['events']) {
         final docRef = _firestore!.collection('events').doc();
         batch.set(docRef, event);
       }
-      
+
       // Restore users
       for (final user in backup['users']) {
         final docRef = _firestore!.collection('users').doc();
         batch.set(docRef, user);
       }
-      
+
       await batch.commit();
-      print("✅ Restore data thành công");
+      print("✅ Data restored successfully");
     } catch (e) {
       print("❌ Lỗi restore data: $e");
       rethrow;

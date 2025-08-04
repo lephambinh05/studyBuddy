@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
 import 'package:studybuddy/data/models/user.dart';
 import 'package:studybuddy/core/constants/app_constants.dart';
 
@@ -19,10 +20,14 @@ class FirebaseAuthService {
       );
 
   /// Stream theo dõi trạng thái authentication từ Firebase
-  Stream<fb_auth.User?> get authStateChanges => _firebaseAuth.authStateChanges();
+  Stream<fb_auth.User?> get authStateChanges {
+    return _firebaseAuth.authStateChanges();
+  }
 
   /// Lấy user hiện tại từ Firebase Auth
-  fb_auth.User? get currentUser => _firebaseAuth.currentUser;
+  fb_auth.User? get currentUser {
+    return _firebaseAuth.currentUser;
+  }
 
   /// Đăng ký với email và password
   Future<fb_auth.User?> registerWithEmailAndPassword(String email, String password, String displayName) async {

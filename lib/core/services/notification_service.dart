@@ -33,49 +33,27 @@ class NotificationService {
   // Khởi tạo notification service
   static Future<void> initialize() async {
     try {
-      // Load user preferences
-      await _loadNotificationPreferences();
-      await _loadUserBehavior();
-      
-      // Kiểm tra platform
-      if (kIsWeb) {
-        print('🌐 Web platform detected - FCM may not work in development');
-        
-        // Thử khởi tạo FCM cho web
-        try {
-          await FirebaseMessaging.instance.requestPermission(
-            alert: true,
-            badge: true,
-            sound: true,
-          );
-          print('✅ FCM permissions granted');
-        } catch (e) {
-          print('⚠️ FCM permissions failed (normal in development): $e');
-        }
-        
-        // Thử khởi tạo local notifications
-        try {
-          await _initializeLocalNotifications();
-          print('✅ Local notifications initialized');
-        } catch (e) {
-          print('⚠️ Local notifications failed: $e');
-        }
-        
-        print('✅ Notification service đã được khởi tạo (development mode)');
-        return;
-      }
-      
+      print('🔄 NotificationService: Bắt đầu khởi tạo...');
+
+      // Initialize timezone
+      tz.initializeTimeZones();
+
       // Mobile platforms
-      await _initializeLocalNotifications();
-      await _initializeFirebaseMessaging();
-      
-      // Start smart notification monitoring
-      _startSmartNotificationMonitoring();
-      
-      print('✅ Notification service đã được khởi tạo');
+      try {
+        await _initializeLocalNotifications();
+        await _initializeFirebaseMessaging();
+
+        // Start smart notification monitoring
+        _startSmartNotificationMonitoring();
+
+        print('✅ Notification service đã được khởi tạo');
+      } catch (e) {
+        print('❌ Error initializing notification service: $e');
+        // Don't rethrow, let the app continue without notifications
+      }
     } catch (e) {
       print('❌ Error initializing notification service: $e');
-      // Không throw error để app vẫn chạy được
+      // Don't rethrow, let the app continue without notifications
     }
   }
   
@@ -680,7 +658,7 @@ class NotificationService {
     }
     
     // Check user's notification preferences
-    if (!_notificationPreferences[type] ?? true) {
+    if (!(_notificationPreferences[type] ?? true)) {
       return false;
     }
     

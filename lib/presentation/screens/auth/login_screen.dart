@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:studybuddy/core/services/auth_service.dart';
+import 'package:studybuddy/presentation/providers/auth_provider.dart';
+import 'package:studybuddy/presentation/widgets/auth/auth_form_field.dart';
 import 'package:studybuddy/core/theme/app_theme.dart';
 import 'package:studybuddy/presentation/screens/auth/signup_screen.dart';
 import 'package:studybuddy/presentation/screens/main_screen.dart';
@@ -32,9 +33,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await AuthService.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
+      await ref.read(authNotifierProvider.notifier).signInWithEmail(
+        _emailController.text.trim(),
+        _passwordController.text,
       );
 
       if (mounted) {
@@ -68,7 +69,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
 
     try {
-      await AuthService.resetPassword(email);
+      await ref.read(authNotifierProvider.notifier).sendPasswordResetEmail(email);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -91,6 +92,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authNotifierProvider);
+    
+    // Show error message if any
+    if (authState.errorMessage != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(authState.errorMessage!),
+            backgroundColor: Colors.red,
+          ),
+        );
+      });
+    }
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -182,18 +197,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           // Email field
-                          TextFormField(
+                          AuthFormField(
                             controller: _emailController,
+                            labelText: 'Email',
+                            prefixIcon: Icons.email_outlined,
                             keyboardType: TextInputType.emailAddress,
-                            decoration: InputDecoration(
-                              labelText: 'Email',
-                              prefixIcon: const Icon(Icons.email_outlined),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              filled: true,
-                              fillColor: Colors.grey[50],
-                            ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Vui lòng nhập email';
@@ -207,27 +215,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           const SizedBox(height: 16),
 
                           // Password field
-                          TextFormField(
+                          AuthFormField(
                             controller: _passwordController,
+                            labelText: 'Mật khẩu',
+                            prefixIcon: Icons.lock_outlined,
                             obscureText: _obscurePassword,
-                            decoration: InputDecoration(
-                              labelText: 'Mật khẩu',
-                              prefixIcon: const Icon(Icons.lock_outlined),
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscurePassword = !_obscurePassword;
-                                  });
-                                },
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword ? Icons.visibility : Icons.visibility_off,
                               ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              filled: true,
-                              fillColor: Colors.grey[50],
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -256,7 +257,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                           // Login button
                           ElevatedButton(
-                            onPressed: _isLoading ? null : _signIn,
+                            onPressed: (_isLoading || authState.status == AuthStatus.authenticating) ? null : _signIn,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppThemes.primaryColor,
                               foregroundColor: Colors.white,
@@ -265,7 +266,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            child: _isLoading
+                            child: (_isLoading || authState.status == AuthStatus.authenticating)
                                 ? const SizedBox(
                                     height: 20,
                                     width: 20,

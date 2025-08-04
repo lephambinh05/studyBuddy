@@ -39,7 +39,7 @@ class AuthState {
 }
 
 class AuthNotifier extends StateNotifier<AuthState> {
-  final FirebaseAuthService _firebaseAuthService;
+  final FirebaseAuthService _firebaseAuthService; // Changed to non-nullable
   // final AnalyticsService? _analyticsService; // Tùy chọn
   StreamSubscription<fb_auth.User?>? _authStateSubscription;
   StreamSubscription<UserModel?>? _appUserSubscription;
@@ -70,37 +70,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     });
   }
 
-  Future<void> _fetchAppUser(String userId) async {
-    _appUserSubscription?.cancel();
-    try {
-      _appUserSubscription = _firebaseAuthService.getUserStream(userId).listen((appUserData) {
-        if (appUserData != null) {
-          state = state.copyWith(status: AuthStatus.authenticated, appUser: appUserData);
-          // _analyticsService?.setUserId(userId);
-          // _analyticsService?.setUserProperty(name: 'display_name', value: appUserData.displayName);
-        } else {
-          // Trường hợp hiếm: có Firebase user nhưng không có app user data trong Firestore
-          // Thử tạo lại user data từ Firebase user
-          print("Warning: Firebase user exists but no app user data found for UID: $userId");
-          _tryRecreateUserData(userId);
-        }
-      });
-    } catch (e) {
-      print("Error fetching app user: $e");
-      state = state.copyWith(status: AuthStatus.error, errorMessage: "Could not load user profile.");
-    }
-  }
-
-  Future<void> _tryRecreateUserData(String userId) async {
-    try {
-      await _firebaseAuthService.recreateUserData(userId);
-      // Sau khi tạo lại user data, _fetchAppUser sẽ tự động cập nhật state
-    } catch (e) {
-      print("Error recreating user data: $e");
-      state = state.copyWith(status: AuthStatus.error, errorMessage: "Could not restore user profile. Please try logging out and in again.");
-    }
-  }
-
   Future<void> signInWithEmail(String email, String password) async {
     state = state.copyWith(status: AuthStatus.authenticating, errorMessage: null);
     try {
@@ -111,6 +80,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       // _analyticsService?.logLogin('email');
     } catch (e) {
       String errorMessage = "Đăng nhập thất bại";
+      
+      // Xử lý các lỗi Firebase cụ thể
       if (e.toString().contains('user-not-found')) {
         errorMessage = "Email không tồn tại. Vui lòng kiểm tra lại hoặc đăng ký tài khoản mới.";
       } else if (e.toString().contains('wrong-password')) {
@@ -123,7 +94,21 @@ class AuthNotifier extends StateNotifier<AuthState> {
         errorMessage = "Quá nhiều lần thử đăng nhập. Vui lòng thử lại sau.";
       } else if (e.toString().contains('network')) {
         errorMessage = "Lỗi kết nối mạng. Vui lòng kiểm tra kết nối internet.";
+      } else if (e.toString().contains('api-key-not-valid')) {
+        errorMessage = "Lỗi cấu hình Firebase. Vui lòng liên hệ nhà phát triển.";
+      } else if (e.toString().contains('internal-error')) {
+        errorMessage = "Lỗi hệ thống. Vui lòng thử lại sau.";
+      } else if (e.toString().contains('invalid-credential')) {
+        errorMessage = "Thông tin đăng nhập không hợp lệ.";
+      } else if (e.toString().contains('operation-not-allowed')) {
+        errorMessage = "Phương thức đăng nhập này không được hỗ trợ.";
+      } else if (e.toString().contains('weak-password')) {
+        errorMessage = "Mật khẩu quá yếu. Vui lòng chọn mật khẩu mạnh hơn.";
+      } else if (e.toString().contains('email-already-in-use')) {
+        errorMessage = "Email đã được sử dụng. Vui lòng đăng nhập hoặc sử dụng email khác.";
       }
+      
+      print("❌ Auth error: $e");
       state = state.copyWith(status: AuthStatus.error, errorMessage: errorMessage);
     }
   }
@@ -132,56 +117,92 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(status: AuthStatus.authenticating, errorMessage: null);
     try {
       final fbUser = await _firebaseAuthService.registerWithEmailAndPassword(email, password, displayName);
-      if (fbUser == null) { // Nên được xử lý bởi listenToAuthChanges
+      if (fbUser == null) {
         state = state.copyWith(status: AuthStatus.unauthenticated, errorMessage: "Registration failed.");
       }
       // _analyticsService?.logSignUp('email');
     } catch (e) {
       String errorMessage = "Đăng ký thất bại";
+      
       if (e.toString().contains('email-already-in-use')) {
-        errorMessage = "Email này đã được sử dụng. Vui lòng thử email khác hoặc đăng nhập.";
+        errorMessage = "Email đã được sử dụng. Vui lòng đăng nhập hoặc sử dụng email khác.";
       } else if (e.toString().contains('weak-password')) {
         errorMessage = "Mật khẩu quá yếu. Vui lòng chọn mật khẩu mạnh hơn.";
       } else if (e.toString().contains('invalid-email')) {
         errorMessage = "Email không hợp lệ. Vui lòng kiểm tra lại.";
-      } else if (e.toString().contains('network')) {
-        errorMessage = "Lỗi kết nối mạng. Vui lòng kiểm tra kết nối internet.";
+      } else if (e.toString().contains('operation-not-allowed')) {
+        errorMessage = "Đăng ký bằng email không được hỗ trợ.";
+      } else if (e.toString().contains('api-key-not-valid')) {
+        errorMessage = "Lỗi cấu hình Firebase. Vui lòng liên hệ nhà phát triển.";
       }
+      
       state = state.copyWith(status: AuthStatus.error, errorMessage: errorMessage);
     }
   }
 
   Future<void> signOut() async {
-    state = state.copyWith(status: AuthStatus.authenticating); // Tạm thời
     try {
       await _firebaseAuthService.signOut();
-      // listenToAuthChanges sẽ tự động cập nhật state thành unauthenticated
+      // _analyticsService?.logLogout();
     } catch (e) {
-      state = state.copyWith(status: AuthStatus.error, errorMessage: "Error signing out: $e");
+      print("❌ Sign out error: $e");
+      // Vẫn set state về unauthenticated ngay cả khi có lỗi
+      state = state.copyWith(
+          status: AuthStatus.unauthenticated,
+          firebaseUser: null,
+          clearAppUser: true,
+          errorMessage: null);
     }
   }
 
   Future<void> sendPasswordResetEmail(String email) async {
-    // Không thay đổi trạng thái AuthStatus ở đây, chỉ hiển thị thông báo
     try {
       await _firebaseAuthService.sendPasswordResetEmail(email);
     } catch (e) {
-      // Ném lỗi để UI có thể bắt và hiển thị
-      rethrow;
+      String errorMessage = "Gửi email reset password thất bại";
+      
+      if (e.toString().contains('user-not-found')) {
+        errorMessage = "Email không tồn tại trong hệ thống.";
+      } else if (e.toString().contains('invalid-email')) {
+        errorMessage = "Email không hợp lệ.";
+      } else if (e.toString().contains('api-key-not-valid')) {
+        errorMessage = "Lỗi cấu hình Firebase. Vui lòng liên hệ nhà phát triển.";
+      }
+      
+      state = state.copyWith(errorMessage: errorMessage);
     }
   }
 
-  // Cập nhật thông tin người dùng (ví dụ: displayName, photoUrl)
-  Future<void> updateAppUser(UserModel updatedUser) async {
-    if (state.status != AuthStatus.authenticated || state.appUser == null) return;
+  Future<void> updateAppUser(UserModel user) async {
     try {
-      await _firebaseAuthService.updateUser(updatedUser);
-      // _fetchAppUser(updatedUser.id) // Hoặc cập nhật state trực tiếp nếu thành công
-      state = state.copyWith(appUser: updatedUser);
+      await _firebaseAuthService.updateUser(user);
+      state = state.copyWith(appUser: user);
     } catch (e) {
-      print("Error updating app user: $e");
-      // Ném lỗi để UI có thể xử lý
-      rethrow;
+      print("❌ Update user error: $e");
+      state = state.copyWith(errorMessage: "Cập nhật thông tin thất bại");
+    }
+  }
+
+  Future<void> _fetchAppUser(String userId) async {
+    _appUserSubscription?.cancel();
+    _appUserSubscription = _firebaseAuthService.getUserStream(userId).listen((appUser) {
+      if (appUser != null) {
+        state = state.copyWith(status: AuthStatus.authenticated, appUser: appUser, errorMessage: null);
+      } else {
+        // Thử tạo lại user data nếu không tìm thấy
+        _tryRecreateUserData(userId);
+      }
+    });
+  }
+
+  Future<void> _tryRecreateUserData(String userId) async {
+    try {
+      await _firebaseAuthService.recreateUserData(userId);
+      // Fetch lại user data
+      _fetchAppUser(userId);
+    } catch (e) {
+      print("❌ Recreate user data error: $e");
+      state = state.copyWith(status: AuthStatus.error, errorMessage: "Không thể tải thông tin người dùng");
     }
   }
 
@@ -193,11 +214,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 }
 
-// Riverpod provider cho AuthNotifier
+// Provider cho AuthNotifier
 final authNotifierProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final firebaseAuthService = ref.watch(firebaseAuthServiceProvider);
-  // final analyticsService = ref.watch(analyticsServiceProvider); // Nếu dùng
-  return AuthNotifier(firebaseAuthService /*, analyticsService */);
+  return AuthNotifier(firebaseAuthService);
 });
 
 // Provider tiện ích để chỉ lấy trạng thái AuthStatus

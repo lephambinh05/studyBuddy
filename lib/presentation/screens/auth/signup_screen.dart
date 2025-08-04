@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:studybuddy/core/services/auth_service.dart';
+import 'package:studybuddy/presentation/providers/auth_provider.dart';
+import 'package:studybuddy/presentation/widgets/auth/auth_form_field.dart';
 import 'package:studybuddy/core/theme/app_theme.dart';
+import 'package:studybuddy/presentation/screens/auth/login_screen.dart';
 import 'package:studybuddy/presentation/screens/main_screen.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
@@ -41,12 +43,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await AuthService.signUpWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-        name: _nameController.text.trim(),
-        grade: _gradeController.text.trim(),
-        school: _schoolController.text.trim(),
+      await ref.read(authNotifierProvider.notifier).registerWithEmail(
+        _emailController.text.trim(),
+        _passwordController.text,
+        _nameController.text.trim(),
       );
 
       if (mounted) {
@@ -79,6 +79,20 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authNotifierProvider);
+    
+    // Show error message if any
+    if (authState.errorMessage != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(authState.errorMessage!),
+            backgroundColor: Colors.red,
+          ),
+        );
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Đăng ký'),
@@ -178,17 +192,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           // Name field
-                          TextFormField(
+                          AuthFormField(
                             controller: _nameController,
-                            decoration: InputDecoration(
-                              labelText: 'Họ và tên',
-                              prefixIcon: const Icon(Icons.person_outlined),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              filled: true,
-                              fillColor: Colors.grey[50],
-                            ),
+                            labelText: 'Họ và tên',
+                            prefixIcon: Icons.person_outlined,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Vui lòng nhập họ và tên';
@@ -199,18 +206,11 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           const SizedBox(height: 16),
 
                           // Email field
-                          TextFormField(
+                          AuthFormField(
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
-                            decoration: InputDecoration(
-                              labelText: 'Email',
-                              prefixIcon: const Icon(Icons.email_outlined),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              filled: true,
-                              fillColor: Colors.grey[50],
-                            ),
+                            labelText: 'Email',
+                            prefixIcon: Icons.email_outlined,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Vui lòng nhập email';
@@ -224,57 +224,36 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           const SizedBox(height: 16),
 
                           // Grade field
-                          TextFormField(
+                          AuthFormField(
                             controller: _gradeController,
-                            decoration: InputDecoration(
-                              labelText: 'Lớp (tùy chọn)',
-                              prefixIcon: const Icon(Icons.grade_outlined),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              filled: true,
-                              fillColor: Colors.grey[50],
-                            ),
+                            labelText: 'Lớp (tùy chọn)',
+                            prefixIcon: Icons.grade_outlined,
                           ),
                           const SizedBox(height: 16),
 
                           // School field
-                          TextFormField(
+                          AuthFormField(
                             controller: _schoolController,
-                            decoration: InputDecoration(
-                              labelText: 'Trường (tùy chọn)',
-                              prefixIcon: const Icon(Icons.school_outlined),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              filled: true,
-                              fillColor: Colors.grey[50],
-                            ),
+                            labelText: 'Trường (tùy chọn)',
+                            prefixIcon: Icons.school_outlined,
                           ),
                           const SizedBox(height: 16),
 
                           // Password field
-                          TextFormField(
+                          AuthFormField(
                             controller: _passwordController,
                             obscureText: _obscurePassword,
-                            decoration: InputDecoration(
-                              labelText: 'Mật khẩu',
-                              prefixIcon: const Icon(Icons.lock_outlined),
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscurePassword = !_obscurePassword;
-                                  });
-                                },
+                            labelText: 'Mật khẩu',
+                            prefixIcon: Icons.lock_outlined,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword ? Icons.visibility : Icons.visibility_off,
                               ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              filled: true,
-                              fillColor: Colors.grey[50],
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -289,27 +268,20 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           const SizedBox(height: 16),
 
                           // Confirm password field
-                          TextFormField(
+                          AuthFormField(
                             controller: _confirmPasswordController,
                             obscureText: _obscureConfirmPassword,
-                            decoration: InputDecoration(
-                              labelText: 'Xác nhận mật khẩu',
-                              prefixIcon: const Icon(Icons.lock_outlined),
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscureConfirmPassword ? Icons.visibility : Icons.visibility_off,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscureConfirmPassword = !_obscureConfirmPassword;
-                                  });
-                                },
+                            labelText: 'Xác nhận mật khẩu',
+                            prefixIcon: Icons.lock_outlined,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscureConfirmPassword ? Icons.visibility : Icons.visibility_off,
                               ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              filled: true,
-                              fillColor: Colors.grey[50],
+                              onPressed: () {
+                                setState(() {
+                                  _obscureConfirmPassword = !_obscureConfirmPassword;
+                                });
+                              },
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -325,7 +297,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
                           // Sign up button
                           ElevatedButton(
-                            onPressed: _isLoading ? null : _signUp,
+                            onPressed: (_isLoading || authState.status == AuthStatus.authenticating) ? null : _signUp,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppThemes.primaryColor,
                               foregroundColor: Colors.white,
@@ -334,7 +306,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            child: _isLoading
+                            child: (_isLoading || authState.status == AuthStatus.authenticating)
                                 ? const SizedBox(
                                     height: 20,
                                     width: 20,

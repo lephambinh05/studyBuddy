@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:studybuddy/core/theme/app_theme.dart';
-import 'package:studybuddy/core/services/auth_service.dart';
+import 'package:studybuddy/presentation/providers/auth_provider.dart';
+import 'package:studybuddy/presentation/providers/study_target_provider.dart';
+import 'package:studybuddy/presentation/providers/task_provider.dart';
+import 'package:studybuddy/presentation/providers/subject_provider.dart';
+import 'package:studybuddy/presentation/providers/theme_provider.dart';
 import 'package:studybuddy/presentation/screens/dashboard/dashboard_screen.dart';
 import 'package:studybuddy/presentation/screens/tasks/tasks_screen.dart';
 import 'package:studybuddy/presentation/screens/calendar/calendar_screen.dart';
@@ -119,7 +123,7 @@ class _MainScreenState extends ConsumerState<MainScreen>
               onPressed: () async {
                 Navigator.of(context).pop();
                 try {
-                  await AuthService.signOut();
+                  await ref.read(authNotifierProvider.notifier).signOut();
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
