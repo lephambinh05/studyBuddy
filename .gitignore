@@ -141,7 +141,6 @@ jspm_packages/
 *.mocks.dart
 
 # Generated files
-lib/generated_plugin_registrant.dart
 
 # Firebase
 firebase_options.dart

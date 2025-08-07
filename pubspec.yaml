@@ -49,7 +49,7 @@ dependencies:
   firebase_messaging: ^14.7.0
   
   # Authentication
-  google_sign_in: ^7.1.1
+  # google_sign_in: ^6.1.5  # Temporarily disabled due to GoogleUtilities conflict
   
   # Local Storage
   sqflite: ^2.4.2
