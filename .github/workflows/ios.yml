@@ -67,6 +67,20 @@ jobs:
             ls -la lib/data/models/ || echo "Directory not found"
           fi
           
+      - name: Setup iOS environment
+        run: |
+          echo "=== Setting up iOS environment ==="
+          cd ios
+          ls -la
+          echo "=== Podfile content ==="
+          cat Podfile || echo "Podfile not found"
+          
+      - name: Install iOS dependencies
+        run: |
+          echo "=== Installing iOS dependencies ==="
+          cd ios
+          pod install --repo-update
+          
       - name: Build iOS Framework
         run: flutter build ios-framework --output=build/ios-framework
         
