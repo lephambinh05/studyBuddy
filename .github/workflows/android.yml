@@ -21,12 +21,52 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
         
-      - name: Generate code
+      - name: Debug - Check current directory
         run: |
-          flutter pub run build_runner clean
-          flutter pub run build_runner build --delete-conflicting-outputs
-          ls -la lib/data/models/
-        
+          pwd
+          ls -la
+          echo "=== Checking lib/data/models/ ==="
+          ls -la lib/data/models/ || echo "Directory not found"
+          
+      - name: Debug - Check study_target.dart
+        run: |
+          echo "=== Content of study_target.dart ==="
+          cat lib/data/models/study_target.dart || echo "File not found"
+          
+      - name: Debug - Check pubspec.yaml for build_runner
+        run: |
+          echo "=== Checking pubspec.yaml for build_runner ==="
+          grep -A 5 -B 5 "build_runner" pubspec.yaml || echo "build_runner not found in pubspec.yaml"
+          grep -A 5 -B 5 "json_annotation" pubspec.yaml || echo "json_annotation not found in pubspec.yaml"
+          
+      - name: Debug - Check Flutter packages
+        run: |
+          echo "=== Installed packages ==="
+          flutter pub deps | grep -E "(build_runner|json_annotation)" || echo "Packages not found"
+          
+      - name: Generate code with verbose output
+        run: |
+          echo "=== Starting build_runner clean ==="
+          flutter pub run build_runner clean --verbose
+          echo "=== Starting build_runner build ==="
+          flutter pub run build_runner build --delete-conflicting-outputs --verbose
+          echo "=== Checking generated files ==="
+          ls -la lib/data/models/ || echo "Directory not found"
+          find . -name "*.g.dart" -type f || echo "No .g.dart files found"
+          
+      - name: Debug - Check if study_target.g.dart was created
+        run: |
+          echo "=== Checking for study_target.g.dart ==="
+          if [ -f "lib/data/models/study_target.g.dart" ]; then
+            echo "✅ study_target.g.dart exists"
+            echo "=== Content preview ==="
+            head -20 lib/data/models/study_target.g.dart
+          else
+            echo "❌ study_target.g.dart NOT found"
+            echo "=== All files in models directory ==="
+            ls -la lib/data/models/ || echo "Directory not found"
+          fi
+          
       - name: Build Android APK
         run: flutter build apk --debug
         
