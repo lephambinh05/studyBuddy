@@ -32,16 +32,6 @@ target 'Runner' do
   use_modular_headers!
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-  
-  # Force Firebase SDK version to resolve conflicts
-  pod 'Firebase/Core', '~> 11.0.0'
-  pod 'Firebase/Auth', '~> 11.0.0'
-  pod 'Firebase/Firestore', '~> 11.0.0'
-  pod 'Firebase/Storage', '~> 11.0.0'
-  pod 'Firebase/Analytics', '~> 11.0.0'
-  pod 'Firebase/Crashlytics', '~> 11.0.0'
-  pod 'Firebase/Performance', '~> 11.0.0'
-  pod 'Firebase/Messaging', '~> 11.0.0'
 end
 
 post_install do |installer|
