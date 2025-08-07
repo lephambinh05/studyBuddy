@@ -26,6 +26,13 @@ jobs:
           flutter pub run build_runner clean
           flutter pub run build_runner build --delete-conflicting-outputs
           
+      - name: Clean iOS build
+        run: |
+          cd ios
+          rm -rf Pods
+          rm -rf Podfile.lock
+          rm -rf .symlinks
+          
       - name: Setup iOS environment
         run: |
           cd ios

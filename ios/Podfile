@@ -52,6 +52,8 @@ post_install do |installer|
         config.build_settings['CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER'] = 'NO'
         config.build_settings['CLANG_WARN_DOCUMENTATION_COMMENTS'] = 'NO'
         config.build_settings['CLANG_WARN_STRICT_PROTOTYPES'] = 'NO'
+        config.build_settings['CLANG_WARN_UNREACHABLE_CODE'] = 'NO'
+        config.build_settings['CLANG_WARN_EMPTY_BODY'] = 'NO'
       end
       
       # Additional fixes for all Firebase targets
@@ -59,6 +61,7 @@ post_install do |installer|
         config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] = '-Onone'
         config.build_settings['GCC_OPTIMIZATION_LEVEL'] = '0'
         config.build_settings['SWIFT_ACTIVE_COMPILATION_CONDITIONS'] = 'DEBUG'
+        config.build_settings['CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER'] = 'NO'
       end
     end
   end
