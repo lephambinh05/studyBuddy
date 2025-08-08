@@ -1,6 +1,6 @@
 workflows:
   ios-workflow:
-    name: iOS Build (C11 Fixed)
+    name: iOS Build (Target Device Fixed)
     environment:
       xcode: latest
       cocoapods: default

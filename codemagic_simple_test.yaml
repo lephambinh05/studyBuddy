@@ -1,0 +1,31 @@
+workflows:
+  ios-simple-workflow:
+    name: iOS Simple Build (Test)
+    environment:
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Setup
+        script: |
+          flutter pub get
+          flutter pub run build_runner build --delete-conflicting-outputs
+      - name: Clean iOS
+        script: |
+          rm -rf ios/Pods
+          rm -f ios/Podfile.lock
+          flutter clean
+      - name: Install pods
+        script: |
+          cd ios
+          pod install --repo-update
+      - name: Build iOS Framework Only
+        script: |
+          flutter build ios-framework --output=build/ios-framework
+    artifacts:
+      - build/ios-framework/
+    publishing:
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_testflight: false
