@@ -20,7 +20,7 @@ workflows:
           pod install --repo-update
       - name: Build iOS Framework
         script: |
-          flutter build ios-framework --output=build/ios-framework
+          flutter build ios-framework --output=build/ios-framework --no-codesign
     artifacts:
       - build/ios-framework/
     publishing:
