@@ -355,6 +355,10 @@
 				SUPPORTED_PLATFORMS = iphoneos;
 				SUPPORTED_PLATFORMS = iphoneos;
 				SUPPORTED_PLATFORMS = iphoneos;
+				SUPPORTED_PLATFORMS = iphoneos;
+				SUPPORTED_PLATFORMS = iphoneos;
+				SUPPORTED_PLATFORMS = iphoneos;
+				SUPPORTED_PLATFORMS = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Profile;
@@ -485,6 +489,10 @@
 				SUPPORTED_PLATFORMS = iphoneos;
 				SUPPORTED_PLATFORMS = iphoneos;
 				SUPPORTED_PLATFORMS = iphoneos;
+				SUPPORTED_PLATFORMS = iphoneos;
+				SUPPORTED_PLATFORMS = iphoneos;
+				SUPPORTED_PLATFORMS = iphoneos;
+				SUPPORTED_PLATFORMS = iphoneos;
 			};
 			name = Debug;
 		};
@@ -538,6 +546,10 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				TARGETED_DEVICE_FAMILY = "1,2";
+				SUPPORTED_PLATFORMS = iphoneos;
+				SUPPORTED_PLATFORMS = iphoneos;
+				SUPPORTED_PLATFORMS = iphoneos;
+				SUPPORTED_PLATFORMS = iphoneos;
 				SUPPORTED_PLATFORMS = iphoneos;
 				SUPPORTED_PLATFORMS = iphoneos;
 				SUPPORTED_PLATFORMS = iphoneos;

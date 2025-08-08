@@ -1,8 +1,8 @@
 workflows:
   ios-full-workflow:
-    name: iOS Full Build (Xcode 15.0)
+    name: iOS Full Build (Xcode 14.3)
     environment:
-      xcode: 15.0
+      xcode: 14.3
       cocoapods: default
       vars:
         XCODE_WORKSPACE: "ios/Runner.xcworkspace"
