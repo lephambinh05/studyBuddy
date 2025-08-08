@@ -1,6 +1,6 @@
 workflows:
   ios-workflow:
-    name: iOS Build (iOS 15.0 Minimum)
+    name: iOS Build (Clean pbxproj)
     environment:
       xcode: 14.3
       cocoapods: default

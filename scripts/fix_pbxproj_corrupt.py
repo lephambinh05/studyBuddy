@@ -1,4 +1,39 @@
-// !$*UTF8*$!
+#!/usr/bin/env python3
+"""
+Script fix project.pbxproj bị corrupt
+"""
+
+import os
+import re
+import subprocess
+import sys
+
+def backup_pbxproj():
+    """Backup project.pbxproj hiện tại"""
+    print("🔧 Backing up current project.pbxproj...")
+    
+    pbxproj_path = 'ios/Runner.xcodeproj/project.pbxproj'
+    backup_path = 'ios/Runner.xcodeproj/project.pbxproj.backup'
+    
+    if os.path.exists(pbxproj_path):
+        with open(pbxproj_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        with open(backup_path, 'w', encoding='utf-8') as f:
+            f.write(content)
+        
+        print("✅ project.pbxproj đã được backup")
+    else:
+        print("❌ project.pbxproj không tồn tại")
+
+def create_clean_pbxproj():
+    """Tạo project.pbxproj sạch với iOS 15.0"""
+    print("🔧 Creating clean project.pbxproj with iOS 15.0...")
+    
+    pbxproj_path = 'ios/Runner.xcodeproj/project.pbxproj'
+    
+    # Tạo project.pbxproj cơ bản
+    clean_content = '''// !$*UTF8*$!
 {
 	archiveVersion = 1;
 	classes = {
@@ -165,7 +200,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/bin/sh "$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh" embed_and_thin";
+			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" embed_and_thin";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -349,3 +384,153 @@
 	};
 	rootObject = 97C146E71CF9000F007C117D /* Project object */;
 }
+'''
+    
+    with open(pbxproj_path, 'w', encoding='utf-8') as f:
+        f.write(clean_content)
+    
+    print("✅ Clean project.pbxproj đã được tạo với iOS 15.0")
+
+def create_simple_codemagic():
+    """Tạo codemagic.yaml đơn giản"""
+    print("🔧 Creating simple codemagic.yaml...")
+    
+    codemagic_content = """workflows:
+  ios-workflow:
+    name: iOS Build (Clean pbxproj)
+    environment:
+      xcode: 14.3
+      cocoapods: default
+    scripts:
+      - name: Setup
+        script: |
+          flutter pub get
+          flutter pub run build_runner build --delete-conflicting-outputs
+      - name: Clean
+        script: |
+          rm -rf ios/Pods
+          rm -f ios/Podfile.lock
+          flutter clean
+      - name: Install pods
+        script: |
+          cd ios
+          pod install --repo-update
+      - name: Build iOS Framework
+        script: |
+          flutter build ios-framework --output=build/ios-framework
+    artifacts:
+      - build/ios-framework/
+    publishing:
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_testflight: false
+"""
+    
+    with open('codemagic.yaml', 'w') as f:
+        f.write(codemagic_content)
+    
+    print("✅ codemagic.yaml đã được tạo")
+
+def create_guide():
+    """Tạo hướng dẫn fix"""
+    print("🔧 Creating fix guide...")
+    
+    guide_content = """# 🚨 FIX PBXPROJ CORRUPT ERROR
+
+## 📋 **Vấn đề hiện tại:**
+```
+Failed to parse pbxproject /Users/builder/clone/ios/Runner.xcodeproj/project.pbxproj
+```
+
+## 🔧 **Giải pháp:**
+
+### **1. Đã thực hiện:**
+- ✅ **Backup** project.pbxproj hiện tại
+- ✅ **Tạo mới** project.pbxproj sạch
+- ✅ **Cấu hình** iOS 15.0 minimum
+- ✅ **Bundle ID**: com.studybuddy.app
+
+### **2. Cấu hình mới:**
+- **iOS Deployment Target**: 15.0
+- **Bundle ID**: com.studybuddy.app
+- **Xcode Version**: 14.3
+- **Build Type**: Framework-only
+
+## 📱 **Workflows:**
+
+| File | Mục đích |
+|------|----------|
+| **codemagic.yaml** | Framework build (mặc định) |
+| **project.pbxproj** | Clean iOS project file |
+
+## ⚠️ **Lưu ý:**
+
+### **Backup:**
+- File cũ: `ios/Runner.xcodeproj/project.pbxproj.backup`
+- File mới: `ios/Runner.xcodeproj/project.pbxproj`
+
+### **Test Steps:**
+1. **Build test** với project.pbxproj mới
+2. **Check** không còn lỗi parse
+3. **Verify** iOS 15.0 settings
+4. **Test** framework build
+
+## 🎯 **Expected Result:**
+
+- ✅ Không còn lỗi "Failed to parse pbxproject"
+- ✅ Build thành công với iOS 15.0
+- ✅ Framework được tạo
+- ✅ Sẵn sàng cho TestFlight
+"""
+    
+    with open('PBXPROJ_FIX_GUIDE.md', 'w') as f:
+        f.write(guide_content)
+    
+    print("✅ PBXPROJ_FIX_GUIDE.md đã được tạo")
+
+def main():
+    """Main function"""
+    print("🚨 FIXING PBXPROJ CORRUPT ERROR")
+    print("=" * 60)
+    
+    print("\n📋 Vấn đề:")
+    print("1. Lỗi: 'Failed to parse pbxproject'")
+    print("2. Nguyên nhân: project.pbxproj bị corrupt")
+    print("3. Giải pháp: Tạo mới project.pbxproj sạch")
+    
+    print("\n🔧 Thực hiện fixes...")
+    
+    # Backup current file
+    backup_pbxproj()
+    
+    # Create clean pbxproj
+    create_clean_pbxproj()
+    
+    # Create simple codemagic
+    create_simple_codemagic()
+    
+    # Create guide
+    create_guide()
+    
+    print("\n" + "=" * 60)
+    print("✅ PBXPROJ FIXES ĐÃ HOÀN THÀNH!")
+    
+    print("\n📋 Bước tiếp theo:")
+    print("1. Push code lên GitHub:")
+    print("   git add .")
+    print("   git commit -m 'Fix pbxproj corrupt: create clean project.pbxproj'")
+    print("   git push origin main")
+    print("\n2. Test build:")
+    print("   - Không còn lỗi parse")
+    print("   - Framework build thành công")
+    print("   - iOS 15.0 settings hoạt động")
+    
+    print("\n🔍 Files:")
+    print("- project.pbxproj: Clean iOS project file")
+    print("- project.pbxproj.backup: Backup file cũ")
+    print("- codemagic.yaml: Simple framework build")
+
+if __name__ == "__main__":
+    main() 
