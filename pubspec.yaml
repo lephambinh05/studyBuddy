@@ -37,16 +37,16 @@ dependencies:
   # State Management
   flutter_riverpod: ^2.6.1
   
-  # Firebase Services (Web temporarily disabled)
+  # Firebase Services (Minimal for iOS testing)
   firebase_core: ^2.20.0
   # firebase_core_web: ^2.8.0  # Temporarily disabled
   firebase_auth: ^4.12.0
   cloud_firestore: ^4.11.0
-  firebase_storage: ^11.4.0
-  firebase_analytics: ^10.5.0
-  firebase_crashlytics: ^3.3.0
-  firebase_performance: ^0.9.2+8
-  firebase_messaging: ^14.6.0
+  # firebase_storage: ^11.4.0  # Temporarily disabled for iOS testing
+  # firebase_analytics: ^10.5.0  # Temporarily disabled for iOS testing
+  # firebase_crashlytics: ^3.3.0  # Temporarily disabled for iOS testing
+  # firebase_performance: ^0.9.2+8  # Temporarily disabled for iOS testing
+  # firebase_messaging: ^14.6.0  # Temporarily disabled for iOS testing
   
   # Authentication
   # google_sign_in: ^6.1.5  # Temporarily disabled due to GoogleUtilities conflict

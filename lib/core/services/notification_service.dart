@@ -1,4 +1,4 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';  // Temporarily disabled
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +8,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 
 class NotificationService {
-  static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
+  // static final FirebaseMessaging _messaging = FirebaseMessaging.instance;  // Temporarily disabled
   static final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -41,7 +41,7 @@ class NotificationService {
       // Mobile platforms
       try {
         await _initializeLocalNotifications();
-        await _initializeFirebaseMessaging();
+        // await _initializeFirebaseMessaging();  // Temporarily disabled
 
         // Start smart notification monitoring
         _startSmartNotificationMonitoring();
@@ -86,40 +86,44 @@ class NotificationService {
   
   // Khởi tạo Firebase Messaging
   static Future<void> _initializeFirebaseMessaging() async {
-    // Request permission for iOS
-    NotificationSettings settings = await _messaging.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
+    // Temporarily disabled for iOS testing
+    print('Firebase Messaging temporarily disabled for iOS testing');
+    return;
     
-    print('User granted permission: ${settings.authorizationStatus}');
+    // Request permission for iOS
+    // NotificationSettings settings = await _messaging.requestPermission(
+    //   alert: true,
+    //   announcement: false,
+    //   badge: true,
+    //   carPlay: false,
+    //   criticalAlert: false,
+    //   provisional: false,
+    //   sound: true,
+    // );
+    
+    // print('User granted permission: ${settings.authorizationStatus}');
     
     // Get FCM token
-    String? token = await _messaging.getToken();
-    if (token != null) {
-      print('FCM Token: $token');
-      await _saveTokenToDatabase(token);
-    }
+    // String? token = await _messaging.getToken();  // Temporarily disabled
+    // if (token != null) {  // Temporarily disabled
+    //   print('FCM Token: $token');  // Temporarily disabled
+    //   await _saveTokenToDatabase(token);  // Temporarily disabled
+    // }  // Temporarily disabled
     
     // Listen for token refresh
-    _messaging.onTokenRefresh.listen((newToken) {
-      print('FCM Token refreshed: $newToken');
-      _saveTokenToDatabase(newToken);
-    });
+    // _messaging.onTokenRefresh.listen((newToken) {  // Temporarily disabled
+    //   print('FCM Token refreshed: $newToken');  // Temporarily disabled
+    //   _saveTokenToDatabase(newToken);  // Temporarily disabled
+    // });  // Temporarily disabled
     
     // Handle background messages
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);  // Temporarily disabled
     
     // Handle foreground messages
-    FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
+    // FirebaseMessaging.onMessage.listen(_handleForegroundMessage);  // Temporarily disabled
     
     // Handle notification taps when app is opened from notification
-    FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationTap);
+    // FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationTap);  // Temporarily disabled
   }
   
   // Save FCM token to database
@@ -139,45 +143,45 @@ class NotificationService {
   }
   
   // Handle background messages
-  static Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-    print("Handling background message: ${message.messageId}");
-    
-    // Show local notification
-    await _showLocalNotification(
-      id: message.hashCode,
-      title: message.notification?.title ?? 'StudyBuddy',
-      body: message.notification?.body ?? '',
-      payload: message.data.toString(),
-    );
-  }
+  // static Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {  // Temporarily disabled
+  //   print("Handling background message: ${message.messageId}");  // Temporarily disabled
+  //    // Temporarily disabled
+  //   // Show local notification  // Temporarily disabled
+  //   await _showLocalNotification(  // Temporarily disabled
+  //     id: message.hashCode,  // Temporarily disabled
+  //     title: message.notification?.title ?? 'StudyBuddy',  // Temporarily disabled
+  //     body: message.notification?.body ?? '',  // Temporarily disabled
+  //     payload: message.data.toString(),  // Temporarily disabled
+  //   );  // Temporarily disabled
+  // }  // Temporarily disabled
   
   // Handle foreground messages
-  static void _handleForegroundMessage(RemoteMessage message) {
-    print("Handling foreground message: ${message.messageId}");
-    
-    // Show local notification
-    _showLocalNotification(
-      id: message.hashCode,
-      title: message.notification?.title ?? 'StudyBuddy',
-      body: message.notification?.body ?? '',
-      payload: message.data.toString(),
-    );
-  }
+  // static void _handleForegroundMessage(RemoteMessage message) {  // Temporarily disabled
+  //   print("Handling foreground message: ${message.messageId}");  // Temporarily disabled
+  //    // Temporarily disabled
+  //   // Show local notification  // Temporarily disabled
+  //   _showLocalNotification(  // Temporarily disabled
+  //     id: message.hashCode,  // Temporarily disabled
+  //     title: message.notification?.title ?? 'StudyBuddy',  // Temporarily disabled
+  //     body: message.notification?.body ?? '',  // Temporarily disabled
+  //     payload: message.data.toString(),  // Temporarily disabled
+  //   );  // Temporarily disabled
+  // }  // Temporarily disabled
   
   // Handle notification taps
-  static void _handleNotificationTap(RemoteMessage message) {
-    print("Notification tapped: ${message.messageId}");
-    
-    // Handle navigation based on message data
-    final data = message.data;
-    if (data['type'] == 'task_reminder') {
-      // Navigate to task details
-      print("Navigate to task: ${data['taskId']}");
-    } else if (data['type'] == 'event_reminder') {
-      // Navigate to event details
-      print("Navigate to event: ${data['eventId']}");
-    }
-  }
+  // static void _handleNotificationTap(RemoteMessage message) {  // Temporarily disabled
+  //   print("Notification tapped: ${message.messageId}");  // Temporarily disabled
+  //    // Temporarily disabled
+  //   // Handle navigation based on message data  // Temporarily disabled
+  //   final data = message.data;  // Temporarily disabled
+  //   if (data['type'] == 'task_reminder') {  // Temporarily disabled
+  //     // Navigate to task details  // Temporarily disabled
+  //     print("Navigate to task: ${data['taskId']}");  // Temporarily disabled
+  //   } else if (data['type'] == 'event_reminder') {  // Temporarily disabled
+  //     // Navigate to event details  // Temporarily disabled
+  //     print("Navigate to event: ${data['eventId']}");  // Temporarily disabled
+  //   }  // Temporarily disabled
+  // }  // Temporarily disabled
   
   // Show local notification
   static Future<void> _showLocalNotification({
@@ -351,14 +355,14 @@ class NotificationService {
   
   // Subscribe to topics
   static Future<void> subscribeToTopic(String topic) async {
-    await _messaging.subscribeToTopic(topic);
-    print("✅ Subscribed to topic: $topic");
+    // await _messaging.subscribeToTopic(topic);  // Temporarily disabled
+    print("✅ Subscribed to topic: $topic (Firebase Messaging disabled)");
   }
   
   // Unsubscribe from topics
   static Future<void> unsubscribeFromTopic(String topic) async {
-    await _messaging.unsubscribeFromTopic(topic);
-    print("✅ Unsubscribed from topic: $topic");
+    // await _messaging.unsubscribeFromTopic(topic);  // Temporarily disabled
+    print("✅ Unsubscribed from topic: $topic (Firebase Messaging disabled)");
   }
   
   // Send task reminder

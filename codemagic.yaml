@@ -20,6 +20,16 @@ workflows:
         script: |
           flutter pub run build_runner clean
           flutter pub run build_runner build --delete-conflicting-outputs
+      - name: Clean iOS build
+        script: |
+          rm -rf ios/Pods
+          rm -f ios/Podfile.lock
+          rm -rf .symlinks/
+          flutter clean
+      - name: Install iOS dependencies
+        script: |
+          cd ios
+          pod install --repo-update
       - name: Build iOS
         script: |
           flutter build ios --release --no-codesign
@@ -33,4 +43,4 @@ workflows:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
         key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: true 
+        submit_to_testflight: true
