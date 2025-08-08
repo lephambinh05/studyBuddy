@@ -1,27 +1,24 @@
 workflows:
   ios-workflow:
-    name: iOS Framework Build (Xcode 14.3 - Auto Fixed)
+    name: iOS Simple Build (Xcode 14.3)
     environment:
       xcode: 14.3
       cocoapods: default
     scripts:
-      - name: Get Flutter packages
-        script: flutter pub get
-      - name: Generate code
+      - name: Setup
         script: |
-          flutter pub run build_runner clean
+          flutter pub get
           flutter pub run build_runner build --delete-conflicting-outputs
-      - name: Clean iOS build
+      - name: Clean
         script: |
           rm -rf ios/Pods
           rm -f ios/Podfile.lock
-          rm -rf .symlinks/
           flutter clean
-      - name: Install iOS dependencies
+      - name: Install pods
         script: |
           cd ios
           pod install --repo-update
-      - name: Build iOS Framework Only
+      - name: Build iOS Framework
         script: |
           flutter build ios-framework --output=build/ios-framework
     artifacts:
