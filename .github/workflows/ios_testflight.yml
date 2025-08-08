@@ -1,0 +1,54 @@
+name: iOS TestFlight Deployment
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+
+jobs:
+  deploy-ios:
+    runs-on: macos-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.24.0'
+        channel: 'stable'
+    
+    - name: Install dependencies
+      run: flutter pub get
+    
+    - name: Run build runner
+      run: flutter pub run build_runner build --delete-conflicting-outputs
+    
+    - name: Clean iOS
+      run: |
+        rm -rf ios/Pods
+        rm -f ios/Podfile.lock
+        flutter clean
+    
+    - name: Install pods
+      run: |
+        cd ios
+        pod install --repo-update
+    
+    - name: Build iOS App
+      run: flutter build ios --release --no-codesign
+    
+    - name: Create IPA
+      run: |
+        cd ios
+        xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -archivePath build/Runner.xcarchive archive
+        xcodebuild -exportArchive -archivePath build/Runner.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath build/ios
+    
+    - name: Upload to TestFlight
+      uses: apple-actions/upload-testflight@v1
+      with:
+        app-path: ios/build/ios/Runner.ipa
+        api-key: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+        api-key-id: ${{ secrets.APP_STORE_CONNECT_KEY_IDENTIFIER }}
+        api-issuer-id: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }} 

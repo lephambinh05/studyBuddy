@@ -1,0 +1,51 @@
+name: iOS Framework Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-ios-framework:
+    runs-on: macos-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.24.0'
+        channel: 'stable'
+    
+    - name: Install dependencies
+      run: flutter pub get
+    
+    - name: Run build runner
+      run: flutter pub run build_runner build --delete-conflicting-outputs
+    
+    - name: Clean iOS
+      run: |
+        rm -rf ios/Pods
+        rm -f ios/Podfile.lock
+        flutter clean
+    
+    - name: Install pods
+      run: |
+        cd ios
+        pod install --repo-update
+    
+    - name: Build iOS Framework
+      run: flutter build ios-framework --output=build/ios-framework --no-codesign --debug --verbose --no-pub --no-tree-shake-icons
+    
+    - name: Verify Framework
+      run: |
+        ls -la build/ios-framework/
+        echo "Framework build completed successfully!"
+    
+    - name: Upload Framework
+      uses: actions/upload-artifact@v4
+      with:
+        name: ios-framework
+        path: build/ios-framework/ 

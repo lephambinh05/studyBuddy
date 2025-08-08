@@ -14,5 +14,7 @@
 	<false/>
 	<key>uploadSymbols</key>
 	<true/>
+	<key>compileBitcode</key>
+	<false/>
 </dict>
 </plist> 
