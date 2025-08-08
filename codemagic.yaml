@@ -1,6 +1,6 @@
 workflows:
   ios-workflow:
-    name: iOS Framework Build (Scheme Fixed)
+    name: iOS Framework Build (No Scheme)
     environment:
       xcode: 14.3
       cocoapods: default
@@ -20,7 +20,11 @@ workflows:
           pod install --repo-update
       - name: Build iOS Framework
         script: |
-          flutter build ios-framework --output=build/ios-framework --no-codesign --debug --verbose
+          flutter build ios-framework --output=build/ios-framework --no-codesign --debug --verbose --no-pub
+      - name: Verify Framework
+        script: |
+          ls -la build/ios-framework/
+          echo "Framework build completed successfully!"
     artifacts:
       - build/ios-framework/
     publishing:
