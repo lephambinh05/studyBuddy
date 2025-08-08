@@ -1,6 +1,6 @@
 workflows:
   ios-workflow:
-    name: iOS Build (Fixed)
+    name: iOS Build (C++14 Fixed)
     environment:
       xcode: latest
       cocoapods: default
