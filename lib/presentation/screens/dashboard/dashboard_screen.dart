@@ -10,6 +10,7 @@ import 'package:studybuddy/presentation/widgets/task/task_form_dialog.dart';
 import 'package:studybuddy/presentation/screens/tasks/tasks_screen.dart';
 import 'package:studybuddy/presentation/screens/calendar/calendar_screen.dart';
 import 'package:studybuddy/presentation/screens/settings/settings_screen.dart';
+import 'package:studybuddy/presentation/screens/profile/profile_screen.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -100,13 +101,21 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                 IconButton(
                   icon: const Icon(Icons.notifications_outlined),
                   onPressed: () {
-                    // TODO: Navigate to notifications
+                    print('🔔 Notifications button tapped');
+                    // TODO: Navigate to notifications screen when available
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Tính năng thông báo sẽ có sẵn sớm!'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
                   },
                 ),
                 IconButton(
                   icon: const Icon(Icons.person_outline),
                   onPressed: () {
-                    // TODO: Navigate to profile
+                    print('👤 Profile button tapped');
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileScreen()));
                   },
                 ),
               ],
@@ -568,6 +577,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                 label: 'Cài đặt',
                 color: AppThemes.warningColor,
                 onTap: () {
+                  print('🔧 Settings button tapped');
                   Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsScreen()));
                 },
               ),
@@ -705,35 +715,39 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     required Color color,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: color.withOpacity(0.3),
-            width: 1,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: color.withOpacity(0.3),
+              width: 1,
+            ),
           ),
-        ),
-        child: Column(
-          children: [
-            Icon(
-              icon,
-              size: 32,
-              color: color,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          child: Column(
+            children: [
+              Icon(
+                icon,
+                size: 32,
                 color: color,
-                fontWeight: FontWeight.w600,
               ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+              const SizedBox(height: 8),
+              Text(
+                label,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     );

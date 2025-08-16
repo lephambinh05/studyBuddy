@@ -1,8 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:studybuddy/data/models/event_model.dart';
+import 'package:studybuddy/data/sources/local/event_local_storage.dart';
 
 class EventRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  String? get _currentUserId => _auth.currentUser?.uid;
 
   // Mock data cho testing
   List<EventModel> _mockEvents = [
@@ -34,13 +39,21 @@ class EventRepository {
 
   // Lấy tất cả events
   Future<List<EventModel>> getAllEvents() async {
+    final userId = _currentUserId;
+    if (userId == null) return [];
+
     try {
+      print('🔄 EventRepository: Bắt đầu getAllEvents()');
+      print('👤 EventRepository: User ID: $userId');
+      
+      // Thử lấy từ Firebase trước
       final querySnapshot = await _firestore
           .collection('events')
+          .where('userId', isEqualTo: userId)
           .orderBy('startTime', descending: false)
           .get();
 
-      return querySnapshot.docs
+      final events = querySnapshot.docs
           .map((doc) {
             final data = doc.data() as Map<String, dynamic>;
             return EventModel.fromJson({
@@ -49,9 +62,22 @@ class EventRepository {
             });
           })
           .toList();
+
+      print('✅ EventRepository: Firebase trả về ${events.length} events cho user $userId');
+      
+      // Lưu vào local storage để backup
+      await EventLocalStorage.saveEvents(events);
+      
+      return events;
     } catch (e) {
-      print('Firebase error: $e, returning empty list');
-      return [];
+      print('❌ EventRepository: Lỗi khi lấy events từ Firebase: $e');
+      print('🔄 EventRepository: Thử lấy từ local storage...');
+      
+      // Nếu Firebase lỗi, lấy từ local storage
+      final localEvents = await EventLocalStorage.getEvents();
+      print('📱 EventRepository: Local storage có ${localEvents.length} events');
+      
+      return localEvents;
     }
   }
 
@@ -142,38 +168,83 @@ class EventRepository {
   // Thêm event mới
   Future<String> addEvent(EventModel event) async {
     try {
+      print('🔄 EventRepository: Bắt đầu addEvent()');
+      print('📅 EventRepository: Event title: ${event.title}');
+      
+      // Thêm vào Firebase
       final docRef = await _firestore.collection('events').add(event.toJson());
+      final newEvent = event.copyWith(id: docRef.id);
+      
+      // Lưu vào local storage để backup
+      await EventLocalStorage.addEvent(newEvent);
+      
+      print('✅ EventRepository: Đã thêm event thành công với ID: ${docRef.id}');
       return docRef.id;
     } catch (e) {
-      final newEvent = event.copyWith(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-      );
-      _mockEvents.add(newEvent);
-      return newEvent.id;
+      print('❌ EventRepository: Lỗi khi thêm event vào Firebase: $e');
+      
+      // Nếu Firebase lỗi, vẫn lưu vào local storage
+      print('🔄 EventRepository: Lưu vào local storage để backup...');
+      final tempId = DateTime.now().millisecondsSinceEpoch.toString();
+      final tempEvent = event.copyWith(id: tempId);
+      await EventLocalStorage.addEvent(tempEvent);
+      
+      print('📱 EventRepository: Đã lưu event vào local storage với ID tạm: $tempId');
+      return tempId;
     }
   }
 
   // Cập nhật event
   Future<void> updateEvent(String eventId, EventModel event) async {
     try {
+      print('🔄 EventRepository: Bắt đầu updateEvent()');
+      print('📅 EventRepository: Event ID: $eventId, title: ${event.title}');
+      
+      final updatedEvent = event.copyWith(updatedAt: DateTime.now());
+      
+      // Cập nhật Firebase
       await _firestore
           .collection('events')
           .doc(eventId)
-          .update(event.toJson());
+          .update(updatedEvent.toJson());
+      
+      // Cập nhật local storage
+      await EventLocalStorage.updateEvent(eventId, updatedEvent);
+      
+      print('✅ EventRepository: Đã cập nhật event thành công');
     } catch (e) {
-      final index = _mockEvents.indexWhere((e) => e.id == eventId);
-      if (index != -1) {
-        _mockEvents[index] = event;
-      }
+      print('❌ EventRepository: Lỗi khi cập nhật event trong Firebase: $e');
+      
+      // Nếu Firebase lỗi, vẫn cập nhật local storage
+      print('🔄 EventRepository: Cập nhật local storage để backup...');
+      final updatedEvent = event.copyWith(updatedAt: DateTime.now());
+      await EventLocalStorage.updateEvent(eventId, updatedEvent);
+      
+      print('📱 EventRepository: Đã cập nhật event trong local storage');
     }
   }
 
   // Xóa event
   Future<void> deleteEvent(String eventId) async {
     try {
+      print('🔄 EventRepository: Bắt đầu deleteEvent()');
+      print('📅 EventRepository: Event ID: $eventId');
+      
+      // Xóa khỏi Firebase
       await _firestore.collection('events').doc(eventId).delete();
+      
+      // Xóa khỏi local storage
+      await EventLocalStorage.deleteEvent(eventId);
+      
+      print('✅ EventRepository: Đã xóa event thành công');
     } catch (e) {
-      _mockEvents.removeWhere((event) => event.id == eventId);
+      print('❌ EventRepository: Lỗi khi xóa event khỏi Firebase: $e');
+      
+      // Nếu Firebase lỗi, vẫn xóa khỏi local storage
+      print('🔄 EventRepository: Xóa khỏi local storage để backup...');
+      await EventLocalStorage.deleteEvent(eventId);
+      
+      print('📱 EventRepository: Đã xóa event khỏi local storage');
     }
   }
 
@@ -271,5 +342,53 @@ class EventRepository {
       'todayEvents': todayEvents,
       'thisWeekEvents': thisWeekEvents,
     };
+  }
+
+  // Sync dữ liệu từ local storage lên Firebase
+  Future<void> syncLocalToFirebase() async {
+    try {
+      print('🔄 EventRepository: Bắt đầu sync local to Firebase...');
+      
+      final localEvents = await EventLocalStorage.getEvents();
+      final lastSyncTime = await EventLocalStorage.getLastSyncTime();
+      
+      if (localEvents.isEmpty) {
+        print('📱 EventRepository: Không có dữ liệu local để sync');
+        return;
+      }
+
+      print('📱 EventRepository: Tìm thấy ${localEvents.length} events trong local storage');
+      
+      for (final event in localEvents) {
+        try {
+          // Kiểm tra xem event đã tồn tại trên Firebase chưa
+          final existingDoc = await _firestore.collection('events').doc(event.id).get();
+          
+          if (!existingDoc.exists) {
+            // Nếu chưa tồn tại, thêm mới
+            await _firestore.collection('events').doc(event.id).set(event.toJson());
+            print('✅ EventRepository: Đã sync event "${event.title}" lên Firebase');
+          } else {
+            // Nếu đã tồn tại, kiểm tra xem có cần cập nhật không
+            final firebaseEvent = EventModel.fromJson({
+              'id': existingDoc.id,
+              ...existingDoc.data()!,
+            });
+            if (event.updatedAt != null && 
+                (firebaseEvent.updatedAt == null || 
+                 event.updatedAt!.isAfter(firebaseEvent.updatedAt!))) {
+              await _firestore.collection('events').doc(event.id).update(event.toJson());
+              print('✅ EventRepository: Đã cập nhật event "${event.title}" trên Firebase');
+            }
+          }
+        } catch (e) {
+          print('⚠️ EventRepository: Lỗi khi sync event "${event.title}": $e');
+        }
+      }
+      
+      print('✅ EventRepository: Hoàn thành sync local to Firebase');
+    } catch (e) {
+      print('❌ EventRepository: Lỗi khi sync local to Firebase: $e');
+    }
   }
 } 

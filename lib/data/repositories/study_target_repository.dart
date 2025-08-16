@@ -4,7 +4,9 @@ import 'package:studybuddy/core/services/sync_service.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:studybuddy/data/sources/local/study_target_local_storage.dart';
 
 class StudyTargetRepository {
   static const String _tableName = 'study_targets';
@@ -12,10 +14,13 @@ class StudyTargetRepository {
   
   final SyncService _syncService;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final _uuid = Uuid();
   
   // In-memory storage for web platform
   static final List<StudyTarget> _webTargets = [];
+
+  String? get _currentUserId => _auth.currentUser?.uid;
 
   StudyTargetRepository(this._syncService);
 
@@ -93,100 +98,81 @@ class StudyTargetRepository {
   // Create study target
   Future<StudyTarget> createStudyTarget(StudyTarget target) async {
     print('🔄 StudyTargetRepository: Starting createStudyTarget...');
-    print('📊 StudyTargetRepository: Target ID: ${target.id}');
     print('📊 StudyTargetRepository: Target Title: ${target.title}');
-    print('📊 StudyTargetRepository: Target User ID: ${target.userId}');
     
-    final now = DateTime.now();
-    
-    final newTarget = target.copyWith(
-      id: target.id.isEmpty ? _uuid.v4() : target.id,
-      createdAt: now,
-      updatedAt: now,
-    );
+    try {
+      final now = DateTime.now();
+      
+      final newTarget = target.copyWith(
+        id: target.id.isEmpty ? _uuid.v4() : target.id,
+        createdAt: now,
+        updatedAt: now,
+      );
 
-    print('🆔 StudyTargetRepository: Generated ID: ${newTarget.id}');
-
-    if (kIsWeb) {
-      // Use in-memory storage for web
-      print('🌐 StudyTargetRepository: Using in-memory storage (web platform)');
-      _webTargets.add(newTarget);
-      print('✅ StudyTargetRepository: Added to in-memory storage. Total targets: ${_webTargets.length}');
-    } else {
-      // Use SQLite for mobile
-      print('📱 StudyTargetRepository: Using SQLite storage (mobile platform)');
-      try {
-        final db = await SQLiteDatabase.database;
-        await db.insert(_tableName, _toMap(newTarget));
-        print('✅ StudyTargetRepository: Added to SQLite storage');
-      } catch (e) {
-        print('❌ SQLite error: $e');
-        // Fallback to in-memory storage
-        print('🔄 StudyTargetRepository: Falling back to in-memory storage');
-        _webTargets.add(newTarget);
-      }
+      print('🆔 StudyTargetRepository: Generated ID: ${newTarget.id}');
+      
+      // Thêm vào Firebase
+      await _firestore.collection(_collectionName).doc(newTarget.id).set(_toMap(newTarget));
+      
+      // Lưu vào local storage để backup
+      await StudyTargetLocalStorage.addStudyTarget(newTarget);
+      
+      print('✅ StudyTargetRepository: Added to Firebase and local storage');
+      return newTarget;
+    } catch (e) {
+      print('❌ StudyTargetRepository: Error adding to Firebase: $e');
+      
+      // Nếu Firebase lỗi, vẫn lưu vào local storage
+      print('🔄 StudyTargetRepository: Saving to local storage as backup...');
+      final now = DateTime.now();
+      final tempTarget = target.copyWith(
+        id: target.id.isEmpty ? _uuid.v4() : target.id,
+        createdAt: now,
+        updatedAt: now,
+      );
+      await StudyTargetLocalStorage.addStudyTarget(tempTarget);
+      
+      print('📱 StudyTargetRepository: Saved to local storage with ID: ${tempTarget.id}');
+      return tempTarget;
     }
-    
-    // Queue for Firebase sync
-    print('🔄 StudyTargetRepository: Queueing for Firebase sync...');
-    print('📊 StudyTargetRepository: Data to sync: ${_toMap(newTarget)}');
-    await _syncService.queueForSync(_collectionName, newTarget.id, _toMap(newTarget));
-    print('✅ StudyTargetRepository: Queued for sync successfully');
-    
-    print('✅ StudyTargetRepository: createStudyTarget completed successfully');
-    return newTarget;
   }
 
   // Get all study targets for user
   Future<List<StudyTarget>> getStudyTargets(String userId) async {
     print('🔄 StudyTargetRepository: Getting study targets for user: $userId');
     
-    if (kIsWeb) {
-      // Use in-memory storage for web
-      print('🌐 StudyTargetRepository: Reading from in-memory storage (web platform)');
-      final targets = _webTargets
-          .where((target) => target.userId == userId && !target.isDeleted)
-          .toList()
-        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    try {
+      // Thử lấy từ Firebase trước
+      print('📡 StudyTargetRepository: Querying Firebase collection: $_collectionName');
+      final snapshot = await _firestore
+          .collection(_collectionName)
+          .where('user_id', isEqualTo: userId)
+          .where('is_deleted', isEqualTo: false)
+          .orderBy('created_at', descending: true)
+          .get();
+
+      final targets = snapshot.docs
+          .map((doc) {
+            final data = doc.data();
+            return StudyTarget.fromFirebaseJson(data);
+          })
+          .toList();
+
+      print('✅ StudyTargetRepository: Firebase returned ${targets.length} targets');
       
-      print('📊 StudyTargetRepository: Found ${targets.length} targets in memory');
-      for (final target in targets) {
-        print('📋 StudyTargetRepository: Target: ${target.title} (ID: ${target.id})');
-      }
+      // Lưu vào local storage để backup
+      await StudyTargetLocalStorage.saveStudyTargets(targets);
       
       return targets;
-    } else {
-      // Use SQLite for mobile
-      print('📱 StudyTargetRepository: Reading from SQLite storage (mobile platform)');
-      try {
-        final db = await SQLiteDatabase.database;
-        final results = await db.query(
-          _tableName,
-          where: 'user_id = ? AND is_deleted = 0',
-          whereArgs: [userId],
-          orderBy: 'created_at DESC',
-        );
-        
-        print('📊 StudyTargetRepository: Found ${results.length} targets in SQLite');
-        final targets = results.map((row) => _fromMap(row)).toList();
-        
-        for (final target in targets) {
-          print('📋 StudyTargetRepository: Target: ${target.title} (ID: ${target.id})');
-        }
-        
-        return targets;
-      } catch (e) {
-        print('❌ SQLite error: $e');
-        // Fallback to in-memory storage
-        print('🔄 StudyTargetRepository: Falling back to in-memory storage');
-        final targets = _webTargets
-            .where((target) => target.userId == userId && !target.isDeleted)
-            .toList()
-          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-        
-        print('📊 StudyTargetRepository: Found ${targets.length} targets in fallback memory');
-        return targets;
-      }
+    } catch (e) {
+      print('❌ StudyTargetRepository: Error loading from Firebase: $e');
+      print('🔄 StudyTargetRepository: Trying local storage...');
+      
+      // Nếu Firebase lỗi, lấy từ local storage
+      final localTargets = await StudyTargetLocalStorage.getStudyTargets();
+      print('📱 StudyTargetRepository: Local storage has ${localTargets.length} targets');
+      
+      return localTargets;
     }
   }
 
@@ -516,5 +502,50 @@ class StudyTargetRepository {
       updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updated_at']),
       isDeleted: map['is_deleted'] == 1,
     );
+  }
+
+  // Sync dữ liệu từ local storage lên Firebase
+  Future<void> syncLocalToFirebase() async {
+    try {
+      print('🔄 StudyTargetRepository: Bắt đầu sync local to Firebase...');
+      
+      final localTargets = await StudyTargetLocalStorage.getStudyTargets();
+      final lastSyncTime = await StudyTargetLocalStorage.getLastSyncTime();
+      
+      if (localTargets.isEmpty) {
+        print('📱 StudyTargetRepository: Không có dữ liệu local để sync');
+        return;
+      }
+
+      print('📱 StudyTargetRepository: Tìm thấy ${localTargets.length} study targets trong local storage');
+      
+      for (final target in localTargets) {
+        try {
+          // Kiểm tra xem target đã tồn tại trên Firebase chưa
+          final existingDoc = await _firestore.collection(_collectionName).doc(target.id).get();
+          
+          if (!existingDoc.exists) {
+            // Nếu chưa tồn tại, thêm mới
+            await _firestore.collection(_collectionName).doc(target.id).set(_toMap(target));
+            print('✅ StudyTargetRepository: Đã sync study target "${target.title}" lên Firebase');
+          } else {
+            // Nếu đã tồn tại, kiểm tra xem có cần cập nhật không
+            final firebaseTarget = StudyTarget.fromFirebaseJson(existingDoc.data()!);
+            if (target.updatedAt != null && 
+                (firebaseTarget.updatedAt == null || 
+                 target.updatedAt!.isAfter(firebaseTarget.updatedAt!))) {
+              await _firestore.collection(_collectionName).doc(target.id).update(_toMap(target));
+              print('✅ StudyTargetRepository: Đã cập nhật study target "${target.title}" trên Firebase');
+            }
+          }
+        } catch (e) {
+          print('⚠️ StudyTargetRepository: Lỗi khi sync study target "${target.title}": $e');
+        }
+      }
+      
+      print('✅ StudyTargetRepository: Hoàn thành sync local to Firebase');
+    } catch (e) {
+      print('❌ StudyTargetRepository: Lỗi khi sync local to Firebase: $e');
+    }
   }
 } 

@@ -155,6 +155,24 @@ class SubjectNotifier extends StateNotifier<SubjectState> {
       'color': subject.color,
     }).toList();
   }
+
+  // Sync dữ liệu từ local storage lên Firebase
+  Future<void> syncLocalToFirebase() async {
+    try {
+      print('🔄 SubjectNotifier: Bắt đầu sync local to Firebase...');
+      await _repository.syncLocalToFirebase();
+      
+      // Reload subjects sau khi sync
+      await loadSubjects();
+      
+      print('✅ SubjectNotifier: Hoàn thành sync local to Firebase');
+    } catch (e) {
+      print('❌ SubjectNotifier: Lỗi khi sync local to Firebase: $e');
+      state = state.copyWith(
+        errorMessage: 'Không thể đồng bộ dữ liệu: $e',
+      );
+    }
+  }
 }
 
 final subjectRepositoryProvider = Provider<SubjectRepository>((ref) {

@@ -11,6 +11,10 @@ class EventModel extends Equatable {
   final String? location;
   final bool isAllDay;
   final String color; // Hex color code
+  final String? subjectId;
+  final String? userId;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   const EventModel({
     required this.id,
@@ -23,6 +27,10 @@ class EventModel extends Equatable {
     this.location,
     required this.isAllDay,
     required this.color,
+    this.subjectId,
+    this.userId,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory EventModel.fromJson(Map<String, dynamic> json) {
@@ -37,6 +45,14 @@ class EventModel extends Equatable {
       location: json['location'] as String?,
       isAllDay: json['isAllDay'] as bool,
       color: json['color'] as String,
+      subjectId: json['subjectId'] as String?,
+      userId: json['userId'] as String?,
+      createdAt: json['createdAt'] != null 
+          ? DateTime.parse(json['createdAt'] as String)
+          : null,
+      updatedAt: json['updatedAt'] != null 
+          ? DateTime.parse(json['updatedAt'] as String)
+          : null,
     );
   }
 
@@ -52,6 +68,10 @@ class EventModel extends Equatable {
       'location': location,
       'isAllDay': isAllDay,
       'color': color,
+      'subjectId': subjectId,
+      'userId': userId,
+      'createdAt': createdAt?.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
     };
   }
 
@@ -66,6 +86,10 @@ class EventModel extends Equatable {
     String? location,
     bool? isAllDay,
     String? color,
+    String? subjectId,
+    String? userId,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return EventModel(
       id: id ?? this.id,
@@ -78,12 +102,16 @@ class EventModel extends Equatable {
       location: location ?? this.location,
       isAllDay: isAllDay ?? this.isAllDay,
       color: color ?? this.color,
+      subjectId: subjectId ?? this.subjectId,
+      userId: userId ?? this.userId,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
   @override
   List<Object?> get props => [
     id, title, description, startTime, endTime,
-    type, subject, location, isAllDay, color,
+    type, subject, location, isAllDay, color, subjectId, userId, createdAt, updatedAt,
   ];
 } 

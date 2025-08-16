@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:studybuddy/data/models/task_model.dart';
+import 'package:studybuddy/data/sources/local/task_local_storage.dart';
 import 'package:studybuddy/data/repositories/user_repository.dart';
 
 class TaskRepository {
@@ -68,26 +69,20 @@ class TaskRepository {
 
   // Lấy tất cả bài tập của user hiện tại
   Future<List<TaskModel>> getAllTasks() async {
-    print('🔄 TaskRepository: Bắt đầu getAllTasks()');
-    
-    // Kiểm tra user authentication
     final userId = _currentUserId;
-    if (userId == null) {
-      print('⚠️ TaskRepository: Không có user đăng nhập, trả về mock data');
-      return _mockTasks;
-    }
-    
-    print('👤 TaskRepository: User ID: $userId');
-    
+    if (userId == null) return [];
+
     try {
-      print('📡 TaskRepository: Gọi Firebase collection("tasks") với userId filter...');
+      print('🔄 TaskRepository: Bắt đầu getAllTasks()');
+      print('👤 TaskRepository: User ID: $userId');
       
-      // Query tasks theo userId
+      // Thử lấy từ Firebase trước
       final querySnapshot = await _firestore
           .collection('tasks')
           .where('userId', isEqualTo: userId)
+          .orderBy('createdAt', descending: true)
           .get();
-      
+
       final tasks = querySnapshot.docs
           .map((doc) {
             final data = doc.data() as Map<String, dynamic>;
@@ -97,21 +92,22 @@ class TaskRepository {
             });
           })
           .toList();
-      
+
       print('✅ TaskRepository: Firebase trả về ${tasks.length} tasks cho user $userId');
+      
+      // Lưu vào local storage để backup
+      await TaskLocalStorage.saveTasks(tasks);
+      
       return tasks;
     } catch (e) {
-      print('❌ TaskRepository: Firebase error: $e, returning empty list');
+      print('❌ TaskRepository: Lỗi khi lấy tasks từ Firebase: $e');
+      print('🔄 TaskRepository: Thử lấy từ local storage...');
       
-      // Debug: Kiểm tra loại lỗi
-      if (e.toString().contains('permission-denied')) {
-        print('🔍 TaskRepository: Permission denied - kiểm tra Firestore rules');
-        print('🔍 TaskRepository: Project ID: ${_firestore.app.options.projectId}');
-        print('🔍 TaskRepository: Collection: tasks');
-        print('🔍 TaskRepository: User ID: $userId');
-      }
+      // Nếu Firebase lỗi, lấy từ local storage
+      final localTasks = await TaskLocalStorage.getTasks();
+      print('📱 TaskRepository: Local storage có ${localTasks.length} tasks');
       
-      return [];
+      return localTasks;
     }
   }
 
@@ -201,104 +197,84 @@ class TaskRepository {
 
   // Thêm bài tập mới
   Future<String> addTask(TaskModel task) async {
-    final userId = _currentUserId;
-    if (userId == null) {
-      print('⚠️ TaskRepository: Không có user đăng nhập, thêm vào mock data');
-      final newTask = task.copyWith(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        createdAt: DateTime.now(),
-      );
-      _mockTasks.insert(0, newTask);
-      return newTask.id;
-    }
-    
     try {
-      print('📝 TaskRepository: Thêm task mới cho user $userId');
+      print('🔄 TaskRepository: Bắt đầu addTask()');
+      print('📚 TaskRepository: Task title: ${task.title}');
       
-      // Thêm userId vào task data
-      final taskData = task.toJson();
-      taskData['userId'] = userId;
-      taskData['createdAt'] = DateTime.now().toIso8601String();
+      // Thêm vào Firebase
+      final docRef = await _firestore.collection('tasks').add(task.toJson());
+      final newTask = task.copyWith(id: docRef.id);
       
-      final docRef = await _firestore.collection('tasks').add(taskData);
+      // Lưu vào local storage để backup
+      await TaskLocalStorage.addTask(newTask);
+      
       print('✅ TaskRepository: Đã thêm task thành công với ID: ${docRef.id}');
       return docRef.id;
     } catch (e) {
-      print('❌ TaskRepository: Firebase error khi thêm task: $e');
-      rethrow;
+      print('❌ TaskRepository: Lỗi khi thêm task vào Firebase: $e');
+      
+      // Nếu Firebase lỗi, vẫn lưu vào local storage
+      print('🔄 TaskRepository: Lưu vào local storage để backup...');
+      final tempId = DateTime.now().millisecondsSinceEpoch.toString();
+      final tempTask = task.copyWith(id: tempId);
+      await TaskLocalStorage.addTask(tempTask);
+      
+      print('📱 TaskRepository: Đã lưu task vào local storage với ID tạm: $tempId');
+      return tempId;
     }
   }
 
   // Cập nhật bài tập
   Future<void> updateTask(String taskId, TaskModel task) async {
-    final userId = _currentUserId;
-    if (userId == null) {
-      print('⚠️ TaskRepository: Không có user đăng nhập, cập nhật mock data');
-      final index = _mockTasks.indexWhere((t) => t.id == taskId);
-      if (index != -1) {
-        _mockTasks[index] = task;
-      }
-      return;
-    }
-    
     try {
-      print('📝 TaskRepository: Cập nhật task $taskId cho user $userId');
+      print('🔄 TaskRepository: Bắt đầu updateTask()');
+      print('📚 TaskRepository: Task ID: $taskId, title: ${task.title}');
       
-      // Kiểm tra quyền sở hữu trước khi update
-      final doc = await _firestore.collection('tasks').doc(taskId).get();
-      if (!doc.exists) {
-        print('❌ TaskRepository: Task không tồn tại');
-        return;
-      }
+      final updatedTask = task.copyWith(updatedAt: DateTime.now());
       
-      final data = doc.data();
-      if (data?['userId'] != userId) {
-        print('❌ TaskRepository: Task không thuộc về user hiện tại');
-        return;
-      }
+      // Cập nhật Firebase
+      await _firestore
+          .collection('tasks')
+          .doc(taskId)
+          .update(updatedTask.toJson());
       
-      // Thêm userId vào task data
-      final taskData = task.toJson();
-      taskData['userId'] = userId;
+      // Cập nhật local storage
+      await TaskLocalStorage.updateTask(taskId, updatedTask);
       
-      await _firestore.collection('tasks').doc(taskId).update(taskData);
       print('✅ TaskRepository: Đã cập nhật task thành công');
     } catch (e) {
-      print('❌ TaskRepository: Firebase error khi cập nhật task: $e');
-      rethrow;
+      print('❌ TaskRepository: Lỗi khi cập nhật task trong Firebase: $e');
+      
+      // Nếu Firebase lỗi, vẫn cập nhật local storage
+      print('🔄 TaskRepository: Cập nhật local storage để backup...');
+      final updatedTask = task.copyWith(updatedAt: DateTime.now());
+      await TaskLocalStorage.updateTask(taskId, updatedTask);
+      
+      print('📱 TaskRepository: Đã cập nhật task trong local storage');
     }
   }
 
   // Xóa bài tập
   Future<void> deleteTask(String taskId) async {
-    final userId = _currentUserId;
-    if (userId == null) {
-      print('⚠️ TaskRepository: Không có user đăng nhập, xóa khỏi mock data');
-      _mockTasks.removeWhere((task) => task.id == taskId);
-      return;
-    }
-    
     try {
-      print('🗑️ TaskRepository: Xóa task $taskId cho user $userId');
+      print('🔄 TaskRepository: Bắt đầu deleteTask()');
+      print('📚 TaskRepository: Task ID: $taskId');
       
-      // Kiểm tra quyền sở hữu trước khi xóa
-      final doc = await _firestore.collection('tasks').doc(taskId).get();
-      if (!doc.exists) {
-        print('❌ TaskRepository: Task không tồn tại');
-        return;
-      }
-      
-      final data = doc.data();
-      if (data?['userId'] != userId) {
-        print('❌ TaskRepository: Task không thuộc về user hiện tại');
-        return;
-      }
-      
+      // Xóa khỏi Firebase
       await _firestore.collection('tasks').doc(taskId).delete();
+      
+      // Xóa khỏi local storage
+      await TaskLocalStorage.deleteTask(taskId);
+      
       print('✅ TaskRepository: Đã xóa task thành công');
     } catch (e) {
-      print('❌ TaskRepository: Firebase error khi xóa task: $e');
-      rethrow;
+      print('❌ TaskRepository: Lỗi khi xóa task khỏi Firebase: $e');
+      
+      // Nếu Firebase lỗi, vẫn xóa khỏi local storage
+      print('🔄 TaskRepository: Xóa khỏi local storage để backup...');
+      await TaskLocalStorage.deleteTask(taskId);
+      
+      print('📱 TaskRepository: Đã xóa task khỏi local storage');
     }
   }
 
@@ -456,5 +432,53 @@ class TaskRepository {
       'overdueTasks': overdueTasks,
       'completionRate': totalTasks > 0 ? completedTasks / totalTasks : 0.0,
     };
+  }
+
+  // Sync dữ liệu từ local storage lên Firebase
+  Future<void> syncLocalToFirebase() async {
+    try {
+      print('🔄 TaskRepository: Bắt đầu sync local to Firebase...');
+      
+      final localTasks = await TaskLocalStorage.getTasks();
+      final lastSyncTime = await TaskLocalStorage.getLastSyncTime();
+      
+      if (localTasks.isEmpty) {
+        print('📱 TaskRepository: Không có dữ liệu local để sync');
+        return;
+      }
+
+      print('📱 TaskRepository: Tìm thấy ${localTasks.length} tasks trong local storage');
+      
+      for (final task in localTasks) {
+        try {
+          // Kiểm tra xem task đã tồn tại trên Firebase chưa
+          final existingDoc = await _firestore.collection('tasks').doc(task.id).get();
+          
+          if (!existingDoc.exists) {
+            // Nếu chưa tồn tại, thêm mới
+            await _firestore.collection('tasks').doc(task.id).set(task.toJson());
+            print('✅ TaskRepository: Đã sync task "${task.title}" lên Firebase');
+          } else {
+            // Nếu đã tồn tại, kiểm tra xem có cần cập nhật không
+            final firebaseTask = TaskModel.fromJson({
+              'id': existingDoc.id,
+              ...existingDoc.data()!,
+            });
+            if (task.updatedAt != null && 
+                (firebaseTask.updatedAt == null || 
+                 task.updatedAt!.isAfter(firebaseTask.updatedAt!))) {
+              await _firestore.collection('tasks').doc(task.id).update(task.toJson());
+              print('✅ TaskRepository: Đã cập nhật task "${task.title}" trên Firebase');
+            }
+          }
+        } catch (e) {
+          print('⚠️ TaskRepository: Lỗi khi sync task "${task.title}": $e');
+        }
+      }
+      
+      print('✅ TaskRepository: Hoàn thành sync local to Firebase');
+    } catch (e) {
+      print('❌ TaskRepository: Lỗi khi sync local to Firebase: $e');
+    }
   }
 }

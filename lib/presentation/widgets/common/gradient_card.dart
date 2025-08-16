@@ -23,16 +23,19 @@ class GradientCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: margin ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          gradient: gradient ?? AppThemes.cardGradient,
+          gradient: gradient ?? (isDark ? AppThemes.darkCardGradient : AppThemes.cardGradient),
           borderRadius: borderRadius ?? BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: isDark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.08),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -122,6 +125,9 @@ class _AnimatedGradientCardState extends State<AnimatedGradientCard>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
@@ -130,11 +136,11 @@ class _AnimatedGradientCardState extends State<AnimatedGradientCard>
           child: Container(
             margin: widget.margin ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              gradient: widget.gradient ?? AppThemes.cardGradient,
+              gradient: widget.gradient ?? (isDark ? AppThemes.darkCardGradient : AppThemes.cardGradient),
               borderRadius: widget.borderRadius ?? BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(_elevationAnimation.value),
+                  color: isDark ? Colors.black.withOpacity(_elevationAnimation.value * 3) : Colors.black.withOpacity(_elevationAnimation.value),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -183,20 +189,23 @@ class GlassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: margin ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: backgroundColor ?? AppThemes.surfaceColor,
+          color: backgroundColor ?? (isDark ? AppThemes.darkSurfaceColor : AppThemes.surfaceColor),
           borderRadius: borderRadius ?? BorderRadius.circular(16),
           border: Border.all(
-            color: AppThemes.textLightColor.withOpacity(0.2),
+            color: (isDark ? AppThemes.darkTextLightColor : AppThemes.textLightColor).withOpacity(0.2),
             width: 1,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: isDark ? Colors.black.withOpacity(0.2) : Colors.black.withOpacity(0.05),
               blurRadius: 4,
               offset: const Offset(0, 1),
             ),

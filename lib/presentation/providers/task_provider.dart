@@ -316,6 +316,24 @@ class TaskNotifier extends StateNotifier<TaskState> {
       };
     }
   }
+
+  // Sync dữ liệu từ local storage lên Firebase
+  Future<void> syncLocalToFirebase() async {
+    try {
+      print('🔄 TaskNotifier: Bắt đầu sync local to Firebase...');
+      await _repository.syncLocalToFirebase();
+      
+      // Reload tasks sau khi sync
+      await loadTasks();
+      
+      print('✅ TaskNotifier: Hoàn thành sync local to Firebase');
+    } catch (e) {
+      print('❌ TaskNotifier: Lỗi khi sync local to Firebase: $e');
+      state = state.copyWith(
+        error: 'Không thể đồng bộ dữ liệu: $e',
+      );
+    }
+  }
 }
 
 // Provider cho filtered tasks

@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:studybuddy/presentation/providers/settings_provider.dart';
+import 'package:studybuddy/presentation/providers/subject_provider.dart';
+import 'package:studybuddy/presentation/providers/task_provider.dart';
+import 'package:studybuddy/presentation/providers/event_provider.dart';
+import 'package:studybuddy/presentation/providers/study_target_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentAppThemeMode = ref.watch(settingsProvider.notifier).currentAppThemeMode;
+    final settingsNotifier = ref.watch(settingsProvider.notifier);
+    final currentAppThemeMode = settingsNotifier.currentAppThemeMode;
     // currentAppThemeMode là AppThemeMode enum của chúng ta,
     // còn ref.watch(settingsProvider) sẽ trả về ThemeMode của Material.
 
@@ -61,6 +66,127 @@ class SettingsScreen extends ConsumerWidget {
 
               if (selectedTheme != null) {
                 await ref.read(settingsProvider.notifier).setThemeMode(selectedTheme);
+              }
+            },
+          ),
+          const Divider(),
+
+          // Cài đặt đồng bộ dữ liệu
+          Padding(
+            padding: const EdgeInsets.all(16.0).copyWith(bottom: 8.0),
+            child: Text(
+              "Đồng bộ dữ liệu",
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.sync),
+            title: const Text("Đồng bộ môn học"),
+            subtitle: const Text("Đồng bộ dữ liệu môn học từ thiết bị lên cloud"),
+            onTap: () async {
+              try {
+                await ref.read(subjectProvider.notifier).syncLocalToFirebase();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Đồng bộ môn học thành công!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Lỗi đồng bộ: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.task),
+            title: const Text("Đồng bộ bài tập"),
+            subtitle: const Text("Đồng bộ dữ liệu bài tập từ thiết bị lên cloud"),
+            onTap: () async {
+              try {
+                await ref.read(taskProvider.notifier).syncLocalToFirebase();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Đồng bộ bài tập thành công!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Lỗi đồng bộ: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.event),
+            title: const Text("Đồng bộ sự kiện"),
+            subtitle: const Text("Đồng bộ dữ liệu sự kiện từ thiết bị lên cloud"),
+            onTap: () async {
+              try {
+                await ref.read(eventProvider.notifier).syncLocalToFirebase();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Đồng bộ sự kiện thành công!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Lỗi đồng bộ: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.track_changes),
+            title: const Text("Đồng bộ mục tiêu học tập"),
+            subtitle: const Text("Đồng bộ dữ liệu mục tiêu từ thiết bị lên cloud"),
+            onTap: () async {
+              try {
+                await ref.read(studyTargetProvider.notifier).syncLocalToFirebase();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Đồng bộ mục tiêu học tập thành công!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Lỗi đồng bộ: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               }
             },
           ),

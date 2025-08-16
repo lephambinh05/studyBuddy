@@ -187,6 +187,24 @@ class EventNotifier extends StateNotifier<EventState> {
       event.startTime.isAfter(today) && event.startTime.isBefore(tomorrow)
     ).toList();
   }
+
+  // Sync dữ liệu từ local storage lên Firebase
+  Future<void> syncLocalToFirebase() async {
+    try {
+      print('🔄 EventNotifier: Bắt đầu sync local to Firebase...');
+      await _repository.syncLocalToFirebase();
+      
+      // Reload events sau khi sync
+      await loadEvents();
+      
+      print('✅ EventNotifier: Hoàn thành sync local to Firebase');
+    } catch (e) {
+      print('❌ EventNotifier: Lỗi khi sync local to Firebase: $e');
+      state = state.copyWith(
+        error: 'Không thể đồng bộ dữ liệu: $e',
+      );
+    }
+  }
 }
 
 // Provider cho event state

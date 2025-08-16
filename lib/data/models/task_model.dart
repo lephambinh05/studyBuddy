@@ -11,6 +11,9 @@ class TaskModel extends Equatable {
   final int priority; // 1: Low, 2: Medium, 3: High
   final DateTime createdAt;
   final DateTime? completedAt;
+  final DateTime? updatedAt;
+  final String? userId;
+  final String? status;
 
   const TaskModel({
     required this.id,
@@ -23,6 +26,9 @@ class TaskModel extends Equatable {
     required this.priority,
     required this.createdAt,
     this.completedAt,
+    this.updatedAt,
+    this.userId,
+    this.status,
   });
 
   factory TaskModel.fromJson(Map<String, dynamic> json) {
@@ -39,6 +45,11 @@ class TaskModel extends Equatable {
       completedAt: json['completedAt'] != null 
           ? DateTime.parse(json['completedAt'] as String)
           : null,
+      updatedAt: json['updatedAt'] != null 
+          ? DateTime.parse(json['updatedAt'] as String)
+          : null,
+      userId: json['userId'] as String?,
+      status: json['status'] as String?,
     );
   }
 
@@ -54,6 +65,9 @@ class TaskModel extends Equatable {
       'priority': priority,
       'createdAt': createdAt.toIso8601String(),
       'completedAt': completedAt?.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
+      'userId': userId,
+      'status': status,
     };
   }
 
@@ -68,6 +82,9 @@ class TaskModel extends Equatable {
     int? priority,
     DateTime? createdAt,
     DateTime? completedAt,
+    DateTime? updatedAt,
+    String? userId,
+    String? status,
   }) {
     return TaskModel(
       id: id ?? this.id,
@@ -80,12 +97,15 @@ class TaskModel extends Equatable {
       priority: priority ?? this.priority,
       createdAt: createdAt ?? this.createdAt,
       completedAt: completedAt ?? this.completedAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      userId: userId ?? this.userId,
+      status: status ?? this.status,
     );
   }
 
   @override
   List<Object?> get props => [
     id, title, description, subject, subjectId, deadline, 
-    isCompleted, priority, createdAt, completedAt,
+    isCompleted, priority, createdAt, completedAt, updatedAt, userId, status,
   ];
 } 

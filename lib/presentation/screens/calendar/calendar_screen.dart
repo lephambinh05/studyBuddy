@@ -51,17 +51,26 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
     
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
+        child: CustomScrollView(
+          slivers: [
             // Header
-            _buildHeader(theme),
+            SliverToBoxAdapter(
+              child: _buildHeader(theme),
+            ),
             
             // Calendar
-            _buildCalendar(theme),
+            SliverToBoxAdapter(
+              child: _buildCalendar(theme),
+            ),
             
             // Events for selected date
-            Expanded(
+            SliverToBoxAdapter(
               child: _buildEventsList(theme),
+            ),
+            
+            // Bottom padding for FAB
+            const SliverToBoxAdapter(
+              child: SizedBox(height: 100),
             ),
           ],
         ),
@@ -330,9 +339,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
             ),
           ),
           const SizedBox(height: 16),
-          Expanded(
-            child: _buildEventsForSelectedDate(theme),
-          ),
+          _buildEventsForSelectedDate(theme),
         ],
       ),
     );
@@ -383,10 +390,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
       );
     }
     
-    return ListView.builder(
-      itemCount: events.length,
-      itemBuilder: (context, index) {
-        final event = events[index];
+    return Column(
+      children: events.asMap().entries.map((entry) {
+        final index = entry.key;
+        final event = entry.value;
         return FadeTransition(
           opacity: _fadeAnimation,
           child: Padding(
@@ -394,7 +401,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
             child: _buildEventCard(event, theme),
           ),
         );
-      },
+      }).toList(),
     );
   }
 
