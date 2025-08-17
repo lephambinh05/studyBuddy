@@ -27,16 +27,16 @@ class _SubjectFormDialogState extends ConsumerState<SubjectFormDialog> {
   String _selectedColor = '#4CAF50'; // Màu mặc định
 
   final List<Map<String, String>> _colors = [
-    {'name': 'Xanh lá', 'value': '#4CAF50'},
-    {'name': 'Xanh dương', 'value': '#2196F3'},
-    {'name': 'Cam', 'value': '#FF9800'},
-    {'name': 'Tím', 'value': '#9C27B0'},
-    {'name': 'Đỏ', 'value': '#F44336'},
-    {'name': 'Nâu', 'value': '#795548'},
-    {'name': 'Xám', 'value': '#607D8B'},
-    {'name': 'Hồng', 'value': '#E91E63'},
-    {'name': 'Vàng', 'value': '#FFC107'},
-    {'name': 'Xanh ngọc', 'value': '#00BCD4'},
+    {'name': 'Green', 'value': '#4CAF50'},
+    {'name': 'Blue', 'value': '#2196F3'},
+    {'name': 'Orange', 'value': '#FF9800'},
+    {'name': 'Purple', 'value': '#9C27B0'},
+    {'name': 'Red', 'value': '#F44336'},
+    {'name': 'Brown', 'value': '#795548'},
+    {'name': 'Gray', 'value': '#607D8B'},
+    {'name': 'Pink', 'value': '#E91E63'},
+    {'name': 'Yellow', 'value': '#FFC107'},
+    {'name': 'Cyan', 'value': '#00BCD4'},
   ];
 
   @override
@@ -85,7 +85,7 @@ class _SubjectFormDialogState extends ConsumerState<SubjectFormDialog> {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    isEdit ? 'Sửa môn học' : 'Thêm môn học mới',
+                    isEdit ? 'Edit Subject' : 'Add New Subject',
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -98,8 +98,8 @@ class _SubjectFormDialogState extends ConsumerState<SubjectFormDialog> {
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  labelText: 'Tên môn học',
-                  hintText: 'Nhập tên môn học',
+                                  labelText: 'Subject Name',
+                hintText: 'Enter subject name',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -107,7 +107,7 @@ class _SubjectFormDialogState extends ConsumerState<SubjectFormDialog> {
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Vui lòng nhập tên môn học';
+                    return 'Please enter subject name';
                   }
                   return null;
                 },
@@ -118,8 +118,8 @@ class _SubjectFormDialogState extends ConsumerState<SubjectFormDialog> {
               TextFormField(
                 controller: _descriptionController,
                 decoration: InputDecoration(
-                  labelText: 'Mô tả (tùy chọn)',
-                  hintText: 'Nhập mô tả chi tiết',
+                                  labelText: 'Description (optional)',
+                hintText: 'Enter detailed description',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -134,7 +134,7 @@ class _SubjectFormDialogState extends ConsumerState<SubjectFormDialog> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Màu sắc',
+                    'Color',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w500,
                     ),
@@ -179,7 +179,7 @@ class _SubjectFormDialogState extends ConsumerState<SubjectFormDialog> {
                 children: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Hủy'),
+                    child: const Text('Cancel'),
                   ),
                   const SizedBox(width: 12),
                   ElevatedButton(
@@ -191,7 +191,7 @@ class _SubjectFormDialogState extends ConsumerState<SubjectFormDialog> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: Text(isEdit ? 'Cập nhật' : 'Thêm'),
+                    child: Text(isEdit ? 'Update' : 'Add'),
                   ),
                 ],
               ),
@@ -208,7 +208,7 @@ class _SubjectFormDialogState extends ConsumerState<SubjectFormDialog> {
       final userId = authState.firebaseUser?.uid;
       if (userId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Vui lòng đăng nhập để thêm môn học')),
+          const SnackBar(content: Text('Please login to add subjects')),
         );
         return;
       }

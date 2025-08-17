@@ -137,11 +137,11 @@ class EmptyTasksState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return EmptyState(
-      title: 'Chưa có bài tập nào',
-      message: 'Bạn chưa có bài tập nào được tạo. Hãy thêm bài tập đầu tiên để bắt đầu học tập!',
+      title: 'No tasks yet',
+      message: 'You haven\'t created any tasks yet. Add your first task to start studying!',
       icon: Icons.assignment_outlined,
       onActionPressed: onAddTask,
-      actionText: 'Thêm bài tập',
+      actionText: 'Add Task',
     );
   }
 }
@@ -158,11 +158,11 @@ class EmptyEventsState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return EmptyState(
-      title: 'Chưa có sự kiện nào',
-      message: 'Bạn chưa có sự kiện nào được lên lịch. Hãy thêm sự kiện đầu tiên để quản lý thời gian!',
+      title: 'No events yet',
+      message: 'You haven\'t scheduled any events yet. Add your first event to manage your time!',
       icon: Icons.event_outlined,
       onActionPressed: onAddEvent,
-      actionText: 'Thêm sự kiện',
+      actionText: 'Add Event',
     );
   }
 }
@@ -174,8 +174,8 @@ class EmptyNotificationsState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return EmptyState(
-      title: 'Chưa có thông báo nào',
-      message: 'Bạn chưa có thông báo nào. Các thông báo về bài tập và sự kiện sẽ xuất hiện ở đây.',
+      title: 'No notifications yet',
+      message: 'You don\'t have any notifications yet. Task and event notifications will appear here.',
       icon: Icons.notifications_outlined,
     );
   }
@@ -193,8 +193,8 @@ class EmptySearchState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return EmptyState(
-      title: 'Không tìm thấy kết quả',
-      message: 'Không có kết quả nào cho "$searchTerm". Hãy thử tìm kiếm với từ khóa khác.',
+      title: 'No results found',
+      message: 'No results found for "$searchTerm". Try searching with different keywords.',
       icon: Icons.search_off_outlined,
     );
   }

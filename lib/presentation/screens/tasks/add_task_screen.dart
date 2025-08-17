@@ -117,7 +117,7 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
               prefixIcon: Icons.task_alt,
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'Vui lòng nhập tiêu đề nhiệm vụ';
+                  return 'Please enter task title';
                 }
                 if (value.trim().length < 3) {
                   return 'Tiêu đề phải có ít nhất 3 ký tự';
@@ -154,7 +154,7 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Hạn hoàn thành',
+                            'Due date',
                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: Colors.grey[600],
                             ),
@@ -204,37 +204,37 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
   Widget _buildPrioritySelector() {
     return Column(
       children: [
-        _buildPriorityOption(
-          TaskPriority.low,
-          'Thấp',
-          'Không gấp, có thể làm sau',
-          Icons.arrow_downward,
-          Colors.green,
-        ),
-        const SizedBox(height: 8),
-        _buildPriorityOption(
-          TaskPriority.medium,
-          'Trung bình',
-          'Cần hoàn thành trong thời gian',
-          Icons.remove,
-          Colors.orange,
-        ),
-        const SizedBox(height: 8),
-        _buildPriorityOption(
-          TaskPriority.high,
-          'Cao',
-          'Quan trọng, cần ưu tiên',
-          Icons.arrow_upward,
-          Colors.red,
-        ),
-        const SizedBox(height: 8),
-        _buildPriorityOption(
-          TaskPriority.urgent,
-          'Khẩn cấp',
-          'Rất quan trọng, cần làm ngay',
-          Icons.priority_high,
-          Colors.purple,
-        ),
+                 _buildPriorityOption(
+           TaskPriority.low,
+           'Low',
+           'Not urgent, can be done later',
+           Icons.arrow_downward,
+           Colors.green,
+         ),
+         const SizedBox(height: 8),
+         _buildPriorityOption(
+           TaskPriority.medium,
+           'Medium',
+           'Need to complete in time',
+           Icons.remove,
+           Colors.orange,
+         ),
+         const SizedBox(height: 8),
+         _buildPriorityOption(
+           TaskPriority.high,
+           'High',
+           'Important, need priority',
+           Icons.arrow_upward,
+           Colors.red,
+         ),
+         const SizedBox(height: 8),
+         _buildPriorityOption(
+           TaskPriority.urgent,
+           'Urgent',
+           'Very important, need to do now',
+           Icons.priority_high,
+           Colors.purple,
+         ),
       ],
     );
   }

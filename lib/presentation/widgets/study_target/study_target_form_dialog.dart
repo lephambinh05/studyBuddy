@@ -211,7 +211,7 @@ class _StudyTargetFormDialogState extends ConsumerState<StudyTargetFormDialog> {
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Vui lòng nhập tiêu đề';
+                    return 'Please enter title';
                   }
                   return null;
                 },
@@ -239,18 +239,18 @@ class _StudyTargetFormDialogState extends ConsumerState<StudyTargetFormDialog> {
                   prefixIcon: Icon(Icons.category),
                 ),
                 items: [
-                  DropdownMenuItem(
-                    value: StudyTarget.TASK_COUNT,
-                    child: const Text('Số bài tập'),
-                  ),
-                  DropdownMenuItem(
-                    value: StudyTarget.STUDY_DAYS,
-                    child: const Text('Số ngày học'),
-                  ),
-                  DropdownMenuItem(
-                    value: StudyTarget.COMPLETION_RATE,
-                    child: const Text('Tỷ lệ hoàn thành'),
-                  ),
+                                     DropdownMenuItem(
+                     value: StudyTarget.TASK_COUNT,
+                     child: const Text('Task Count'),
+                   ),
+                   DropdownMenuItem(
+                     value: StudyTarget.STUDY_DAYS,
+                     child: const Text('Study Days'),
+                   ),
+                   DropdownMenuItem(
+                     value: StudyTarget.COMPLETION_RATE,
+                     child: const Text('Completion Rate'),
+                   ),
                   DropdownMenuItem(
                     value: StudyTarget.CUSTOM,
                     child: const Text('Tùy chỉnh'),
@@ -277,7 +277,7 @@ class _StudyTargetFormDialogState extends ConsumerState<StudyTargetFormDialog> {
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Vui lòng nhập giá trị mục tiêu';
+                    return 'Please enter target value';
                   }
                   final number = double.tryParse(value);
                   if (number == null || number <= 0) {
@@ -302,7 +302,7 @@ class _StudyTargetFormDialogState extends ConsumerState<StudyTargetFormDialog> {
                       });
                     },
                   ),
-                  const Text('Có ngày kết thúc'),
+                                     const Text('Has end date'),
                 ],
               ),
               if (_hasEndDate) ...[
@@ -320,9 +320,9 @@ class _StudyTargetFormDialogState extends ConsumerState<StudyTargetFormDialog> {
                         const Icon(Icons.calendar_today),
                         const SizedBox(width: 8),
                         Text(
-                          _endDate != null 
-                            ? '${_endDate!.day}/${_endDate!.month}/${_endDate!.year}'
-                            : 'Chọn ngày kết thúc',
+                                                     _endDate != null 
+                             ? '${_endDate!.day}/${_endDate!.month}/${_endDate!.year}'
+                             : 'Select end date',
                         ),
                       ],
                     ),

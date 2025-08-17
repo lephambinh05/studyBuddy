@@ -137,7 +137,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                    prefixIcon: Icons.person,
                    validator: (value) {
                      if (value == null || value.isEmpty) {
-                       return "Vui lòng nhập họ và tên";
+                       return "Please enter full name";
                      }
                      if (value.length < 2) {
                        return "Họ và tên phải có ít nhất 2 ký tự";
@@ -155,7 +155,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                    prefixIcon: Icons.email,
                    validator: (value) {
                      if (value == null || value.isEmpty) {
-                       return "Vui lòng nhập email của bạn";
+                       return "Please enter your email";
                      }
                      if (!RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value)) {
                        return "Email không hợp lệ";
@@ -181,23 +181,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                    ),
                    validator: (value) {
                      if (value == null || value.isEmpty) {
-                       return "Vui lòng nhập mật khẩu";
+                       return "Please enter password";
                      }
                      if (value.length < 6) {
-                       return "Mật khẩu phải có ít nhất 6 ký tự";
+                       return "Password must be at least 6 characters";
                      }
                      if (!RegExp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)").hasMatch(value)) {
-                       return "Mật khẩu phải chứa chữ hoa, chữ thường và số";
+                       return "Password must contain uppercase, lowercase and numbers";
                      }
                      return null;
                    },
                  ),
                 const SizedBox(height: 16),
                 
-                                 // Xác nhận mật khẩu
+                                 // Confirm password
                  AuthFormField(
                    controller: _confirmPasswordController,
-                   labelText: "Xác nhận mật khẩu",
+                   labelText: "Confirm Password",
                    obscureText: _obscureConfirmPassword,
                    prefixIcon: Icons.lock_outline,
                    suffixIcon: IconButton(
@@ -210,17 +210,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                    ),
                    validator: (value) {
                      if (value == null || value.isEmpty) {
-                       return "Vui lòng xác nhận mật khẩu";
+                       return "Please confirm password";
                      }
                      if (value != _passwordController.text) {
-                       return "Mật khẩu không khớp";
+                       return "Passwords do not match";
                      }
                      return null;
                    },
                  ),
                 const SizedBox(height: 24),
                 
-                // Nút đăng ký
+                // Register button
                 _isLoading
                     ? const LoadingIndicator()
                     : ElevatedButton(
@@ -229,28 +229,28 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   onPressed: _register,
-                  child: const Text("ĐĂNG KÝ"),
+                  child: const Text("REGISTER"),
                 ),
                 const SizedBox(height: 20),
                 
-                // Link đăng nhập
+                // Login link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    const Text("Đã có tài khoản?"),
+                    const Text("Already have an account?"),
                     TextButton(
                       onPressed: _isLoading
                           ? null
                           : () => context.go(AppConstants.loginRoute),
-                      child: const Text("Đăng nhập ngay"),
+                      child: const Text("Login now"),
                     ),
                   ],
                 ),
                 
-                // Điều khoản sử dụng
+                // Terms of service
                 const SizedBox(height: 16),
                 Text(
-                  "Bằng cách đăng ký, bạn đồng ý với Điều khoản sử dụng và Chính sách bảo mật",
+                  "By registering, you agree to the Terms of Service and Privacy Policy",
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).textTheme.bodySmall?.color,

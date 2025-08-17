@@ -60,7 +60,7 @@ class _TaskSearchDialogState extends State<TaskSearchDialog> {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  'Tìm kiếm bài tập',
+                  'Search Tasks',
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -78,7 +78,7 @@ class _TaskSearchDialogState extends State<TaskSearchDialog> {
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Nhập từ khóa tìm kiếm...',
+                hintText: 'Enter search keywords...',
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
@@ -126,14 +126,14 @@ class _TaskSearchDialogState extends State<TaskSearchDialog> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Không tìm thấy bài tập nào',
+            'No tasks found',
             style: theme.textTheme.headlineSmall?.copyWith(
               color: Colors.grey.shade600,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Thử tìm kiếm với từ khóa khác',
+            'Try searching with different keywords',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: Colors.grey.shade500,
             ),
@@ -148,7 +148,7 @@ class _TaskSearchDialogState extends State<TaskSearchDialog> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Kết quả tìm kiếm (${_searchResults.length})',
+          'Search Results (${_searchResults.length})',
           style: theme.textTheme.bodyMedium?.copyWith(
             fontWeight: FontWeight.w600,
           ),
@@ -200,7 +200,7 @@ class _TaskSearchDialogState extends State<TaskSearchDialog> {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            'Hạn: ${_formatDate(task.deadline)}',
+                            'Due: ${_formatDate(task.deadline)}',
                             style: TextStyle(
                               color: Colors.grey.shade600,
                               fontSize: 12,
@@ -274,23 +274,23 @@ class _TaskSearchDialogState extends State<TaskSearchDialog> {
 
   Color _getSubjectColor(String subject) {
     switch (subject) {
-      case 'Toán':
+      case 'Math':
         return Colors.blue;
-      case 'Văn':
+      case 'Literature':
         return Colors.red;
-      case 'Anh':
+      case 'English':
         return Colors.green;
-      case 'Lý':
+      case 'Physics':
         return Colors.purple;
-      case 'Hóa':
+      case 'Chemistry':
         return Colors.orange;
-      case 'Sinh':
+      case 'Biology':
         return Colors.teal;
-      case 'Sử':
+      case 'History':
         return Colors.brown;
-      case 'Địa':
+      case 'Geography':
         return Colors.indigo;
-      case 'GDCD':
+      case 'Civics':
         return Colors.pink;
       default:
         return Colors.grey;
@@ -313,13 +313,13 @@ class _TaskSearchDialogState extends State<TaskSearchDialog> {
   String _getPriorityText(int priority) {
     switch (priority) {
       case 1:
-        return 'Thấp';
+        return 'Low';
       case 2:
-        return 'Trung bình';
+        return 'Medium';
       case 3:
-        return 'Cao';
+        return 'High';
       default:
-        return 'Không xác định';
+        return 'Unknown';
     }
   }
 

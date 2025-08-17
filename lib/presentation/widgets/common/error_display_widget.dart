@@ -27,7 +27,7 @@ class ErrorDisplayWidget extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Có lỗi xảy ra',
+              'An error occurred',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -46,7 +46,7 @@ class ErrorDisplayWidget extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh),
-                label: Text(retryText ?? 'Thử lại'),
+                label: Text(retryText ?? 'Retry'),
               ),
             ],
           ],

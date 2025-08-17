@@ -156,57 +156,57 @@ class SubjectRepository {
     }
   }
 
-  // Tạo subject mặc định cho user mới
+  // Create default subjects for new user
   Future<void> createDefaultSubjects(String userId) async {
     try {
-      print('🔄 SubjectRepository: Bắt đầu createDefaultSubjects()');
+      print('🔄 SubjectRepository: Starting createDefaultSubjects()');
       print('👤 SubjectRepository: User ID: $userId');
       
       final defaultSubjects = [
         SubjectModel(
           id: '',
-          name: 'Toán',
-          description: 'Môn Toán học',
+          name: 'Math',
+          description: 'Mathematics subject',
           color: '#4CAF50',
           userId: userId,
           createdAt: DateTime.now(),
         ),
         SubjectModel(
           id: '',
-          name: 'Văn',
-          description: 'Môn Ngữ văn',
+          name: 'Literature',
+          description: 'Literature subject',
           color: '#2196F3',
           userId: userId,
           createdAt: DateTime.now(),
         ),
         SubjectModel(
           id: '',
-          name: 'Anh',
-          description: 'Môn Tiếng Anh',
+          name: 'English',
+          description: 'English subject',
           color: '#FF9800',
           userId: userId,
           createdAt: DateTime.now(),
         ),
         SubjectModel(
           id: '',
-          name: 'Lý',
-          description: 'Môn Vật lý',
+          name: 'Physics',
+          description: 'Physics subject',
           color: '#9C27B0',
           userId: userId,
           createdAt: DateTime.now(),
         ),
         SubjectModel(
           id: '',
-          name: 'Hóa',
-          description: 'Môn Hóa học',
+          name: 'Chemistry',
+          description: 'Chemistry subject',
           color: '#F44336',
           userId: userId,
           createdAt: DateTime.now(),
         ),
         SubjectModel(
           id: '',
-          name: 'Sinh',
-          description: 'Môn Sinh học',
+          name: 'Biology',
+          description: 'Biology subject',
           color: '#795548',
           userId: userId,
           createdAt: DateTime.now(),
@@ -217,9 +217,9 @@ class SubjectRepository {
         await addSubject(subject);
       }
 
-      print('✅ SubjectRepository: Đã tạo ${defaultSubjects.length} subjects mặc định');
+      print('✅ SubjectRepository: Created ${defaultSubjects.length} default subjects');
     } catch (e) {
-      print('❌ SubjectRepository: Lỗi khi tạo subjects mặc định: $e');
+      print('❌ SubjectRepository: Error creating default subjects: $e');
       rethrow;
     }
   }

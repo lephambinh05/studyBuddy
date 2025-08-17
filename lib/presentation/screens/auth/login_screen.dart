@@ -63,7 +63,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final email = _emailController.text.trim();
     if (email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng nhập email')),
+        const SnackBar(content: Text('Please enter email')),
       );
       return;
     }
@@ -204,7 +204,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             keyboardType: TextInputType.emailAddress,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Vui lòng nhập email';
+                                return 'Please enter email';
                               }
                               if (!value.contains('@')) {
                                 return 'Email không hợp lệ';
@@ -232,10 +232,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Vui lòng nhập mật khẩu';
+                                return 'Please enter password';
                               }
                               if (value.length < 6) {
-                                return 'Mật khẩu phải có ít nhất 6 ký tự';
+                                return 'Password must be at least 6 characters';
                               }
                               return null;
                             },
@@ -302,7 +302,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   );
                                 },
                                 child: Text(
-                                  'Đăng ký ngay',
+                                  'Register now',
                                   style: TextStyle(
                                     color: AppThemes.primaryColor,
                                     fontWeight: FontWeight.bold,

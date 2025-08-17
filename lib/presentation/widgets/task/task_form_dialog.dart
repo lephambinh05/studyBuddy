@@ -100,7 +100,7 @@ class _TaskFormDialogState extends ConsumerState<TaskFormDialog> {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    isEdit ? 'Sửa bài tập' : 'Thêm bài tập mới',
+                    isEdit ? 'Edit Task' : 'Add New Task',
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -113,8 +113,8 @@ class _TaskFormDialogState extends ConsumerState<TaskFormDialog> {
               TextFormField(
                 controller: _titleController,
                 decoration: InputDecoration(
-                  labelText: 'Tiêu đề bài tập',
-                  hintText: 'Nhập tiêu đề bài tập',
+                                  labelText: 'Task Title',
+                hintText: 'Enter task title',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -122,7 +122,7 @@ class _TaskFormDialogState extends ConsumerState<TaskFormDialog> {
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Vui lòng nhập tiêu đề bài tập';
+                    return 'Please enter task title';
                   }
                   return null;
                 },
@@ -133,8 +133,8 @@ class _TaskFormDialogState extends ConsumerState<TaskFormDialog> {
               TextFormField(
                 controller: _descriptionController,
                 decoration: InputDecoration(
-                  labelText: 'Mô tả (tùy chọn)',
-                  hintText: 'Nhập mô tả chi tiết',
+                                  labelText: 'Description (optional)',
+                hintText: 'Enter detailed description',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -151,7 +151,7 @@ class _TaskFormDialogState extends ConsumerState<TaskFormDialog> {
                         ? _selectedSubject 
                         : null,
                     decoration: InputDecoration(
-                      labelText: 'Môn học',
+                      labelText: 'Subject',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -170,7 +170,7 @@ class _TaskFormDialogState extends ConsumerState<TaskFormDialog> {
                     },
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Vui lòng chọn môn học';
+                        return 'Please select a subject';
                       }
                       return null;
                     },
@@ -187,7 +187,7 @@ class _TaskFormDialogState extends ConsumerState<TaskFormDialog> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'Chưa có môn học nào. Vui lòng thêm môn học trước.',
+                            'No subjects available. Please add a subject first.',
                             style: TextStyle(color: Colors.grey.shade600),
                           ),
                         ),
@@ -226,7 +226,7 @@ class _TaskFormDialogState extends ConsumerState<TaskFormDialog> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Mức độ ưu tiên',
+                    'Priority Level',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w500,
                     ),
@@ -234,11 +234,11 @@ class _TaskFormDialogState extends ConsumerState<TaskFormDialog> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      _buildPriorityChip(1, 'Thấp', Colors.green),
-                      const SizedBox(width: 8),
-                      _buildPriorityChip(2, 'Trung bình', Colors.orange),
-                      const SizedBox(width: 8),
-                      _buildPriorityChip(3, 'Cao', Colors.red),
+                                             _buildPriorityChip(1, 'Low', Colors.green),
+                       const SizedBox(width: 8),
+                       _buildPriorityChip(2, 'Medium', Colors.orange),
+                       const SizedBox(width: 8),
+                       _buildPriorityChip(3, 'High', Colors.red),
                     ],
                   ),
                 ],
@@ -251,7 +251,7 @@ class _TaskFormDialogState extends ConsumerState<TaskFormDialog> {
                 children: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Hủy'),
+                    child: const Text('Cancel'),
                   ),
                   const SizedBox(width: 12),
                   ElevatedButton(
@@ -263,7 +263,7 @@ class _TaskFormDialogState extends ConsumerState<TaskFormDialog> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: Text(isEdit ? 'Cập nhật' : 'Thêm'),
+                    child: Text(isEdit ? 'Update' : 'Add'),
                   ),
                 ],
               ),
@@ -336,7 +336,7 @@ class _TaskFormDialogState extends ConsumerState<TaskFormDialog> {
       if (subjectState.subjects.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Vui lòng thêm ít nhất một môn học trước khi tạo bài tập'),
+            content: Text('Please add at least one subject before creating a task'),
             backgroundColor: Colors.orange,
           ),
         );

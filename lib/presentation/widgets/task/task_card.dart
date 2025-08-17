@@ -46,13 +46,13 @@ class TaskCard extends StatelessWidget {
   String _getPriorityText() {
     switch (priority) {
       case 1:
-        return 'Cao';
+        return 'High';
       case 2:
-        return 'Trung bình';
+        return 'Medium';
       case 3:
-        return 'Thấp';
+        return 'Low';
       default:
-        return 'Bình thường';
+        return 'Normal';
     }
   }
 
@@ -61,18 +61,18 @@ class TaskCard extends StatelessWidget {
     final difference = deadline.difference(now);
     
     if (difference.isNegative) {
-      return 'Đã trễ hạn';
+      return 'Overdue';
     }
     
     final days = difference.inDays;
     final hours = difference.inHours % 24;
     
     if (days > 0) {
-      return 'Còn $days ngày';
+      return '$days days left';
     } else if (hours > 0) {
-      return 'Còn $hours giờ';
+      return '$hours hours left';
     } else {
-      return 'Còn ${difference.inMinutes} phút';
+      return '${difference.inMinutes} minutes left';
     }
   }
 
@@ -111,17 +111,17 @@ class TaskCard extends StatelessWidget {
               size: 24,
             ),
             const SizedBox(width: 8),
-            const Text('Bài tập đã trễ hạn'),
+            const Text('Task Overdue'),
           ],
         ),
         content: Text(
-          'Bài tập "$title" đã quá hạn deadline (${deadline.day}/${deadline.month}/${deadline.year}). '
-          'Bạn không thể đánh dấu hoàn thành cho bài tập đã trễ hạn.',
+          'Task "$title" has exceeded the deadline (${deadline.day}/${deadline.month}/${deadline.year}). '
+          'You cannot mark as completed for overdue tasks.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Đóng'),
+            child: const Text('Close'),
           ),
         ],
       ),
@@ -277,12 +277,12 @@ class TaskCard extends StatelessWidget {
                             color: _isOverdue() ? AppThemes.errorColor : AppThemes.primaryColor,
                           ),
                           const SizedBox(width: 8),
-                          Text(
-                            _isOverdue() ? 'Đã trễ hạn' : 'Hoàn thành',
-                            style: TextStyle(
-                              color: _isOverdue() ? AppThemes.errorColor : AppThemes.textPrimaryColor,
-                            ),
-                          ),
+                                                     Text(
+                             _isOverdue() ? 'Overdue' : 'Complete',
+                             style: TextStyle(
+                               color: _isOverdue() ? AppThemes.errorColor : AppThemes.textPrimaryColor,
+                             ),
+                           ),
                         ],
                       ),
                     ),
@@ -292,7 +292,7 @@ class TaskCard extends StatelessWidget {
                         children: [
                           Icon(Icons.edit, size: 20, color: AppThemes.textPrimaryColor),
                           const SizedBox(width: 8),
-                          Text('Chỉnh sửa', style: TextStyle(color: AppThemes.textPrimaryColor)),
+                          Text('Edit', style: TextStyle(color: AppThemes.textPrimaryColor)),
                         ],
                       ),
                     ),
@@ -302,7 +302,7 @@ class TaskCard extends StatelessWidget {
                         children: [
                           Icon(Icons.delete, size: 20, color: AppThemes.errorColor),
                           const SizedBox(width: 8),
-                          Text('Xóa', style: TextStyle(color: AppThemes.errorColor)),
+                          Text('Delete', style: TextStyle(color: AppThemes.errorColor)),
                         ],
                       ),
                     ),
@@ -415,17 +415,17 @@ class TaskCardCompact extends StatelessWidget {
               size: 24,
             ),
             const SizedBox(width: 8),
-            const Text('Bài tập đã trễ hạn'),
+            const Text('Task Overdue'),
           ],
         ),
         content: Text(
-          'Bài tập "$title" đã quá hạn deadline (${deadline.day}/${deadline.month}/${deadline.year}). '
-          'Bạn không thể đánh dấu hoàn thành cho bài tập đã trễ hạn.',
+          'Task "$title" has exceeded the deadline (${deadline.day}/${deadline.month}/${deadline.year}). '
+          'You cannot mark as completed for overdue tasks.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Đóng'),
+            child: const Text('Close'),
           ),
         ],
       ),

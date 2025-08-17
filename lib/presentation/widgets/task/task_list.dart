@@ -44,7 +44,7 @@ class TaskList extends StatelessWidget {
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
                     icon: Icons.edit,
-                    label: 'Sửa',
+                    label: 'Edit',
                   ),
                 if (onTaskDelete != null)
                   SlidableAction(
@@ -52,7 +52,7 @@ class TaskList extends StatelessWidget {
                     backgroundColor: Colors.red,
                     foregroundColor: Colors.white,
                     icon: Icons.delete,
-                    label: 'Xóa',
+                    label: 'Delete',
                   ),
               ],
             ),

@@ -135,7 +135,7 @@ class _EventFormDialogState extends State<EventFormDialog> {
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Vui lòng nhập tiêu đề sự kiện';
+                      return 'Please enter event title';
                     }
                     return null;
                   },
@@ -198,10 +198,10 @@ class _EventFormDialogState extends State<EventFormDialog> {
                     prefixIcon: const Icon(Icons.subject),
                   ),
                   items: [
-                    const DropdownMenuItem<String>(
-                      value: null,
-                      child: Text('Không chọn'),
-                    ),
+                                         const DropdownMenuItem<String>(
+                       value: null,
+                       child: Text('None'),
+                     ),
                     ..._subjects.map((subject) {
                       return DropdownMenuItem(
                         value: subject,
@@ -221,8 +221,8 @@ class _EventFormDialogState extends State<EventFormDialog> {
                 TextFormField(
                   controller: _locationController,
                   decoration: InputDecoration(
-                    labelText: 'Địa điểm (tùy chọn)',
-                    hintText: 'Nhập địa điểm',
+                                     labelText: 'Location (optional)',
+                 hintText: 'Enter location',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -243,7 +243,7 @@ class _EventFormDialogState extends State<EventFormDialog> {
                       },
                       activeColor: AppThemes.primaryColor,
                     ),
-                    const Text('Cả ngày'),
+                                         const Text('All day'),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -257,7 +257,7 @@ class _EventFormDialogState extends State<EventFormDialog> {
                           onTap: () => _selectStartTime(context),
                           child: InputDecorator(
                             decoration: InputDecoration(
-                              labelText: 'Thời gian bắt đầu',
+                              labelText: 'Start time',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -276,7 +276,7 @@ class _EventFormDialogState extends State<EventFormDialog> {
                           onTap: () => _selectEndTime(context),
                           child: InputDecorator(
                             decoration: InputDecoration(
-                              labelText: 'Thời gian kết thúc',
+                              labelText: 'End time',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -302,7 +302,7 @@ class _EventFormDialogState extends State<EventFormDialog> {
                         onTap: () => _selectStartDate(context),
                         child: InputDecorator(
                           decoration: InputDecoration(
-                            labelText: 'Ngày bắt đầu',
+                            labelText: 'Start date',
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -321,7 +321,7 @@ class _EventFormDialogState extends State<EventFormDialog> {
                         onTap: () => _selectEndDate(context),
                         child: InputDecorator(
                           decoration: InputDecoration(
-                            labelText: 'Ngày kết thúc',
+                            labelText: 'End date',
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -343,7 +343,7 @@ class _EventFormDialogState extends State<EventFormDialog> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Màu sắc',
+                      'Color',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w500,
                       ),
@@ -418,13 +418,13 @@ class _EventFormDialogState extends State<EventFormDialog> {
   String _getTypeText(String type) {
     switch (type) {
       case 'study':
-        return 'Học tập';
+        return 'Study';
       case 'exam':
-        return 'Kiểm tra';
+        return 'Exam';
       case 'assignment':
-        return 'Bài tập';
+        return 'Assignment';
       case 'other':
-        return 'Khác';
+        return 'Other';
       default:
         return type;
     }
@@ -516,7 +516,7 @@ class _EventFormDialogState extends State<EventFormDialog> {
       if (!_isAllDay && _selectedEndTime.isBefore(_selectedStartTime)) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Thời gian kết thúc phải sau thời gian bắt đầu'),
+            content: Text('End time must be after start time'),
             backgroundColor: Colors.red,
           ),
         );
