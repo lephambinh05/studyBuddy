@@ -97,7 +97,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
         },
         backgroundColor: AppThemes.primaryColor,
         icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text('Thêm bài tập', style: TextStyle(color: Colors.white)),
+        label: const Text('Add Task', style: TextStyle(color: Colors.white)),
       ),
     );
   }
@@ -119,7 +119,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Bài Tập',
+                'Tasks',
                 style: theme.textTheme.headlineMedium?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -145,14 +145,14 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
             children: [
               _buildStatCard(
                 context,
-                'Tổng',
+                'Total',
                 taskState.statistics['totalTasks']?.toString() ?? '0',
                 Icons.assignment,
               ),
               const SizedBox(width: 12),
               _buildStatCard(
                 context,
-                'Hoàn thành',
+                'Completed',
                 taskState.statistics['completedTasks']?.toString() ?? '0',
                 Icons.check_circle,
                 color: Colors.green,
@@ -160,7 +160,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
               const SizedBox(width: 12),
               _buildStatCard(
                 context,
-                'Trễ hạn',
+                'Overdue',
                 taskState.statistics['overdueTasks']?.toString() ?? '0',
                 Icons.warning,
                 color: AppThemes.errorColor,

@@ -65,6 +65,8 @@ class _MyAppState extends ConsumerState<MyApp> {
         theme: themeData,
         themeMode: themeMode,
         debugShowCheckedModeBanner: false,
+        locale: const Locale('en'),
+        supportedLocales: const [Locale('en')],
         home: authState.status == AuthStatus.authenticated
           ? const MainScreen()
           : const LoginScreen(),
@@ -78,6 +80,8 @@ class _MyAppState extends ConsumerState<MyApp> {
         title: 'StudyBuddy',
         theme: AppThemes.lightTheme,
         debugShowCheckedModeBanner: false,
+        locale: const Locale('en'),
+        supportedLocales: const [Locale('en')],
         home: Scaffold(
           body: Center(
             child: Column(
@@ -86,12 +90,12 @@ class _MyAppState extends ConsumerState<MyApp> {
                 const Icon(Icons.error_outline, size: 64, color: Colors.red),
                 const SizedBox(height: 16),
                 const Text(
-                  'Có lỗi xảy ra',
+                  'An error occurred',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Vui lòng khởi động lại ứng dụng',
+                  'Please restart the application',
                   style: TextStyle(color: Colors.grey[600]),
                 ),
                 const SizedBox(height: 16),
@@ -100,7 +104,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                     // Restart the app
                     main();
                   },
-                  child: const Text('Thử lại'),
+                  child: const Text('Retry'),
                 ),
               ],
             ),

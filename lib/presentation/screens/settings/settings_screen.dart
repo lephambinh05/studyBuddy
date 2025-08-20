@@ -18,14 +18,14 @@ class SettingsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Cài Đặt"),
+        title: const Text("Settings"),
       ),
       body: ListView(
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.all(16.0).copyWith(bottom: 8.0),
             child: Text(
-              "Giao diện",
+              "Interface",
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     color: Theme.of(context).colorScheme.primary,
                     fontWeight: FontWeight.bold,
@@ -34,14 +34,14 @@ class SettingsScreen extends ConsumerWidget {
           ),
           ListTile(
             leading: const Icon(Icons.brightness_6_outlined),
-            title: const Text("Chủ đề ứng dụng"),
+            title: const Text("App Theme"),
             subtitle: Text(currentAppThemeMode.displayName),
             onTap: () async {
               final AppThemeMode? selectedTheme = await showDialog<AppThemeMode>(
                 context: context,
                 builder: (BuildContext context) {
                   return SimpleDialog(
-                    title: const Text('Chọn chủ đề'),
+                    title: const Text('Choose Theme'),
                     children: AppThemeMode.values.map((theme) {
                       return SimpleDialogOption(
                         onPressed: () {

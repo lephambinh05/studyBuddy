@@ -23,7 +23,7 @@ class TaskList extends StatelessWidget {
   Widget build(BuildContext context) {
     if (tasks.isEmpty) {
       return const Center(
-        child: Text('Không có nhiệm vụ nào'),
+        child: Text('No tasks available'),
       );
     }
 

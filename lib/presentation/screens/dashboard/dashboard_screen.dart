@@ -190,7 +190,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
          heroTag: 'dashboard_fab',
          onPressed: () => _showAddTaskDialog(context),
          icon: const Icon(Icons.add),
-         label: const Text('Thêm bài tập'),
+                         label: const Text('Add Task'),
          backgroundColor: AppThemes.primaryColor,
        ),
     );
@@ -275,7 +275,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                   context: context,
                   icon: Icons.schedule,
                   value: taskState.statistics['pendingTasks']?.toString() ?? '0',
-                  label: 'Còn lại',
+                  label: 'Remaining',
                   color: Colors.white,
                 ),
               ),
@@ -302,7 +302,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Thống kê nhanh',
+          'Quick Statistics',
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -316,7 +316,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                   context: context,
                   icon: Icons.trending_up,
                   value: '${completionPercentage}%',
-                  label: 'Tiến độ',
+                  label: 'Progress',
                   color: AppThemes.accentColor,
                 ),
               ),
@@ -328,7 +328,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                   context: context,
                   icon: Icons.local_fire_department,
                   value: '$consecutiveDays',
-                  label: 'Ngày liên tiếp',
+                  label: 'Consecutive Days',
                   color: AppThemes.warningColor,
                 ),
               ),
@@ -355,7 +355,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Bài tập hôm nay',
+              'Today\'s Tasks',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -364,7 +364,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               onPressed: () {
                 // TODO: Navigate to all tasks
               },
-              child: const Text('Xem tất cả'),
+              child: const Text('View All'),
             ),
           ],
         ),
@@ -381,11 +381,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               border: Border.all(color: Colors.grey.shade200),
             ),
                          child: EmptyState(
-               title: 'Không có bài tập hôm nay',
-               message: 'Bạn không có bài tập nào cần làm hôm nay. Hãy thêm bài tập mới!',
+               title: 'No tasks today',
+               message: 'You have no tasks to do today. Add a new task!',
                icon: Icons.assignment_outlined,
                onActionPressed: () => _showAddTaskDialog(context),
-               actionText: 'Thêm bài tập',
+               actionText: 'Add Task',
              ),
           )
         else
@@ -414,7 +414,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Tiến độ học tập',
+            'Study Progress',
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -428,11 +428,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               border: Border.all(color: Colors.grey.shade200),
             ),
                          child: EmptyState(
-               title: 'Chưa có dữ liệu tiến độ',
-               message: 'Bạn chưa có bài tập nào để tính tiến độ. Hãy thêm bài tập để bắt đầu!',
+               title: 'No progress data',
+               message: 'You have no tasks to calculate progress. Add tasks to get started!',
                icon: Icons.trending_up_outlined,
                onActionPressed: () => _showAddTaskDialog(context),
-               actionText: 'Thêm bài tập',
+               actionText: 'Add Task',
              ),
           ),
         ],
@@ -443,7 +443,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Tiến độ học tập',
+          'Study Progress',
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -456,7 +456,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Tổng thể',
+                    'Overall',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -486,7 +486,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       context: context,
                       icon: Icons.assignment,
                       value: totalTasks.toString(),
-                      label: 'Tổng bài tập',
+                      label: 'Total Tasks',
                       color: AppThemes.primaryColor,
                     ),
                   ),
@@ -496,7 +496,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       context: context,
                       icon: Icons.check_circle,
                       value: (taskState.statistics['completedTasks'] ?? 0).toString(),
-                      label: 'Đã hoàn thành',
+                      label: 'Completed',
                       color: AppThemes.accentColor,
                     ),
                   ),
@@ -506,7 +506,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       context: context,
                       icon: Icons.schedule,
                       value: (taskState.statistics['pendingTasks'] ?? 0).toString(),
-                      label: 'Còn lại',
+                      label: 'Remaining',
                       color: AppThemes.warningColor,
                     ),
                   ),
