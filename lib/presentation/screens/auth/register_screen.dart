@@ -41,7 +41,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Đăng ký thất bại: ${e.toString()}')),
+            SnackBar(content: Text('Register failed: ${e.toString()}')),
           );
         }
       } finally {
@@ -83,7 +83,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         if (ModalRoute.of(context)?.isCurrent ?? false) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Đăng ký thành công!'),
+              content: Text('Register successfully!'),
               backgroundColor: Colors.green,
               duration: Duration(seconds: 2),
             ),
@@ -96,7 +96,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Đăng Ký"),
+        title: const Text("Register"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -115,13 +115,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 const FlutterLogo(size: 80),
                 const SizedBox(height: 32),
                 Text(
-                  "Tạo tài khoản mới",
+                  "Create new account",
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  "Tham gia cùng StudyBuddy để quản lý việc học hiệu quả",
+                  "Join StudyBuddy to manage your study effectively",
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).textTheme.bodySmall?.color,
@@ -132,7 +132,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                  // Họ và tên
                  AuthFormField(
                    controller: _nameController,
-                   labelText: "Họ và tên",
+                   labelText: "Full name",
                    keyboardType: TextInputType.name,
                    prefixIcon: Icons.person,
                    validator: (value) {
@@ -140,7 +140,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                        return "Please enter full name";
                      }
                      if (value.length < 2) {
-                       return "Họ và tên phải có ít nhất 2 ký tự";
+                       return "Full name must be at least 2 characters";
                      }
                      return null;
                    },
@@ -158,7 +158,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                        return "Please enter your email";
                      }
                      if (!RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value)) {
-                       return "Email không hợp lệ";
+                       return "Invalid email";
                      }
                      return null;
                    },
@@ -168,7 +168,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                  // Mật khẩu
                  AuthFormField(
                    controller: _passwordController,
-                   labelText: "Mật khẩu",
+                    labelText: "Password",
                    obscureText: _obscurePassword,
                    prefixIcon: Icons.lock,
                    suffixIcon: IconButton(
@@ -197,7 +197,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                  // Confirm password
                  AuthFormField(
                    controller: _confirmPasswordController,
-                   labelText: "Confirm Password",
+                   labelText: "Confirm password",
                    obscureText: _obscureConfirmPassword,
                    prefixIcon: Icons.lock_outline,
                    suffixIcon: IconButton(
@@ -229,7 +229,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   onPressed: _register,
-                  child: const Text("REGISTER"),
+                  child: const Text("Register"),
                 ),
                 const SizedBox(height: 20),
                 
@@ -242,7 +242,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       onPressed: _isLoading
                           ? null
                           : () => context.go(AppConstants.loginRoute),
-                      child: const Text("Login now"),
+                      child: const Text("Login"),
                     ),
                   ],
                 ),

@@ -46,7 +46,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 600), // Giảm thời gian animation
       vsync: this,
     );
 
@@ -55,15 +55,17 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
       end: 1.0,
     ).animate(CurvedAnimation(
       parent: _animationController,
-      curve: Curves.easeInOut,
+      curve: Curves.easeOut, // Sử dụng curve nhẹ hơn
     ));
 
     _animationController.forward();
     
-    // Load data khi screen được khởi tạo
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(taskProvider.notifier).loadTasks();
-      ref.read(subjectProvider.notifier).loadSubjects();
+    // Load data khi screen được khởi tạo - sử dụng Future.delayed để tránh blocking UI
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) {
+        ref.read(taskProvider.notifier).loadTasks();
+        ref.read(subjectProvider.notifier).loadSubjects();
+      }
     });
   }
 
@@ -80,14 +82,24 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
 
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(theme, taskState),
-            _buildFilters(theme),
-            Expanded(
-              child: _buildTasksList(taskState, theme),
-            ),
-          ],
+        child: RefreshIndicator(
+          onRefresh: () async {
+            await ref.read(taskProvider.notifier).loadTasks();
+          },
+          child: CustomScrollView(
+            slivers: [
+              // Header
+              SliverToBoxAdapter(
+                child: _buildHeader(theme, taskState),
+              ),
+              // Filters
+              SliverToBoxAdapter(
+                child: _buildFilters(theme),
+              ),
+              // Tasks List
+              _buildTasksSliverList(taskState, theme),
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -318,6 +330,52 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
     );
   }
 
+  Widget _buildTasksSliverList(TaskState taskState, ThemeData theme) {
+    if (taskState.isLoading) {
+      return SliverToBoxAdapter(
+        child: _buildLoadingState(),
+      );
+    }
+
+    if (taskState.error != null) {
+      return SliverToBoxAdapter(
+        child: _buildErrorState(taskState.error!, theme),
+      );
+    }
+
+    final filteredTasks = _getFilteredTasks(taskState.tasks);
+
+    if (filteredTasks.isEmpty) {
+      return SliverToBoxAdapter(
+        child: _buildEmptyState(theme),
+      );
+    }
+
+    return SliverPadding(
+      padding: const EdgeInsets.all(16),
+      sliver: SliverList.separated(
+        itemCount: filteredTasks.length,
+        separatorBuilder: (context, index) => const SizedBox(height: 8),
+        itemBuilder: (context, index) {
+          final task = filteredTasks[index];
+          return TaskCard(
+            title: task.title,
+            description: task.description,
+            subject: task.subject,
+            deadline: task.deadline,
+            isCompleted: task.isCompleted,
+            priority: task.priority,
+            isLoading: _togglingTasks.contains(task.id),
+            onTap: () => _showTaskDetails(context, task),
+            onToggleComplete: () => _toggleTaskCompletion(task),
+            onEdit: () => _showEditTaskDialog(context, task),
+            onDelete: () => _showDeleteTaskDialog(context, task),
+          );
+        },
+      ),
+    );
+  }
+
   Widget _buildTasksList(TaskState taskState, ThemeData theme) {
     if (taskState.isLoading) {
       return _buildLoadingState();
@@ -337,26 +395,24 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
       onRefresh: () async {
         await ref.read(taskProvider.notifier).loadTasks();
       },
-      child: ListView.builder(
+      child: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: filteredTasks.length,
+        separatorBuilder: (context, index) => const SizedBox(height: 8),
         itemBuilder: (context, index) {
           final task = filteredTasks[index];
-          return FadeTransition(
-            opacity: _fadeAnimation,
-            child: TaskCard(
-              title: task.title,
-              description: task.description,
-              subject: task.subject,
-              deadline: task.deadline,
-              isCompleted: task.isCompleted,
-              priority: task.priority,
-              isLoading: _togglingTasks.contains(task.id),
-              onTap: () => _showTaskDetails(context, task),
-              onToggleComplete: () => _toggleTaskCompletion(task),
-              onEdit: () => _showEditTaskDialog(context, task),
-              onDelete: () => _showDeleteTaskDialog(context, task),
-            ),
+          return TaskCard(
+            title: task.title,
+            description: task.description,
+            subject: task.subject,
+            deadline: task.deadline,
+            isCompleted: task.isCompleted,
+            priority: task.priority,
+            isLoading: _togglingTasks.contains(task.id),
+            onTap: () => _showTaskDetails(context, task),
+            onToggleComplete: () => _toggleTaskCompletion(task),
+            onEdit: () => _showEditTaskDialog(context, task),
+            onDelete: () => _showDeleteTaskDialog(context, task),
           );
         },
       ),
@@ -547,8 +603,29 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
     showDialog(
       context: context,
       builder: (context) => TaskFormDialog(
-        onSave: (task) {
-          ref.read(taskProvider.notifier).addTask(task);
+        onSave: (task) async {
+          try {
+            await ref.read(taskProvider.notifier).addTask(task);
+            if (context.mounted) {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Đã thêm bài tập "${task.title}"'),
+                  backgroundColor: AppThemes.primaryColor,
+                ),
+              );
+            }
+          } catch (e) {
+            if (context.mounted) {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Không thể thêm bài tập. Vui lòng thử lại sau.'),
+                  backgroundColor: AppThemes.errorColor,
+                ),
+              );
+            }
+          }
         },
       ),
     );

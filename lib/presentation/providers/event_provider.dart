@@ -191,17 +191,17 @@ class EventNotifier extends StateNotifier<EventState> {
   // Sync dữ liệu từ local storage lên Firebase
   Future<void> syncLocalToFirebase() async {
     try {
-      print('🔄 EventNotifier: Bắt đầu sync local to Firebase...');
+      print('🔄 EventNotifier: Starting sync local to Firebase...');
       await _repository.syncLocalToFirebase();
       
-      // Reload events sau khi sync
+      // Reload events after sync
       await loadEvents();
       
-      print('✅ EventNotifier: Hoàn thành sync local to Firebase');
+      print('✅ EventNotifier: Sync local to Firebase completed');
     } catch (e) {
-      print('❌ EventNotifier: Lỗi khi sync local to Firebase: $e');
+      print('❌ EventNotifier: Error syncing local to Firebase: $e');
       state = state.copyWith(
-        error: 'Không thể đồng bộ dữ liệu: $e',
+        error: 'Cannot sync data: $e',
       );
     }
   }

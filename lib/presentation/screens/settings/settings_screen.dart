@@ -75,7 +75,7 @@ class SettingsScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.all(16.0).copyWith(bottom: 8.0),
             child: Text(
-              "Đồng bộ dữ liệu",
+              "Sync data",
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     color: Theme.of(context).colorScheme.primary,
                     fontWeight: FontWeight.bold,
@@ -84,15 +84,15 @@ class SettingsScreen extends ConsumerWidget {
           ),
           ListTile(
             leading: const Icon(Icons.sync),
-            title: const Text("Đồng bộ môn học"),
-            subtitle: const Text("Đồng bộ dữ liệu môn học từ thiết bị lên cloud"),
+            title: const Text("Sync subjects"),
+            subtitle: const Text("Sync subject data from device to cloud"),
             onTap: () async {
               try {
                 await ref.read(subjectProvider.notifier).syncLocalToFirebase();
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Đồng bộ môn học thành công!'),
+                      content: Text('Sync subjects successfully!'),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -101,7 +101,7 @@ class SettingsScreen extends ConsumerWidget {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Lỗi đồng bộ: $e'),
+                      content: Text('Error syncing: $e'),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -111,15 +111,15 @@ class SettingsScreen extends ConsumerWidget {
           ),
           ListTile(
             leading: const Icon(Icons.task),
-            title: const Text("Đồng bộ bài tập"),
-            subtitle: const Text("Đồng bộ dữ liệu bài tập từ thiết bị lên cloud"),
+            title: const Text("Sync tasks"),
+            subtitle: const Text("Sync task data from device to cloud"),
             onTap: () async {
               try {
                 await ref.read(taskProvider.notifier).syncLocalToFirebase();
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Đồng bộ bài tập thành công!'),
+                      content: Text('Sync tasks successfully!'),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -128,7 +128,7 @@ class SettingsScreen extends ConsumerWidget {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Lỗi đồng bộ: $e'),
+                      content: Text('Error syncing: $e'),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -138,15 +138,15 @@ class SettingsScreen extends ConsumerWidget {
           ),
           ListTile(
             leading: const Icon(Icons.event),
-            title: const Text("Đồng bộ sự kiện"),
-            subtitle: const Text("Đồng bộ dữ liệu sự kiện từ thiết bị lên cloud"),
+            title: const Text("Sync events"),
+            subtitle: const Text("Sync event data from device to cloud"),
             onTap: () async {
               try {
                 await ref.read(eventProvider.notifier).syncLocalToFirebase();
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Đồng bộ sự kiện thành công!'),
+                      content: Text('Sync events successfully!'),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -155,7 +155,7 @@ class SettingsScreen extends ConsumerWidget {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Lỗi đồng bộ: $e'),
+                      content: Text('Error syncing: $e'),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -165,15 +165,15 @@ class SettingsScreen extends ConsumerWidget {
           ),
           ListTile(
             leading: const Icon(Icons.track_changes),
-            title: const Text("Đồng bộ mục tiêu học tập"),
-            subtitle: const Text("Đồng bộ dữ liệu mục tiêu từ thiết bị lên cloud"),
+            title: const Text("Sync study targets"),
+            subtitle: const Text("Sync study target data from device to cloud"),
             onTap: () async {
               try {
                 await ref.read(studyTargetProvider.notifier).syncLocalToFirebase();
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Đồng bộ mục tiêu học tập thành công!'),
+                        content: Text('Sync study targets successfully!'),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -182,7 +182,7 @@ class SettingsScreen extends ConsumerWidget {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Lỗi đồng bộ: $e'),
+                      content: Text('Error syncing: $e'),
                       backgroundColor: Colors.red,
                     ),
                   );

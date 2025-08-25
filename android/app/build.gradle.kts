@@ -30,6 +30,26 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        
+        // Thêm cấu hình để tránh lỗi Google API và Sidecar
+        multiDexEnabled = true
+    }
+    
+    // Thêm cấu hình để tránh lỗi Sidecar window backend
+    packaging {
+        resources {
+            excludes += listOf(
+                "META-INF/DEPENDENCIES",
+                "META-INF/LICENSE",
+                "META-INF/LICENSE.txt",
+                "META-INF/license.txt",
+                "META-INF/NOTICE",
+                "META-INF/NOTICE.txt",
+                "META-INF/notice.txt",
+                "META-INF/ASL2.0",
+                "META-INF/*.kotlin_module"
+            )
+        }
     }
 
     buildTypes {
@@ -47,4 +67,8 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    
+    // Thêm dependencies để tránh lỗi Google API
+    implementation("androidx.multidex:multidex:2.0.1")
+    implementation("androidx.window:window:1.0.0")
 }

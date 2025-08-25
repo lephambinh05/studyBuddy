@@ -37,7 +37,7 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bảo mật'),
+        title: const Text('Security'),
         backgroundColor: AppThemes.primaryColor,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -63,7 +63,7 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'Trạng thái bảo mật',
+                          'Security status',
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -83,7 +83,7 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'Tài khoản được bảo vệ',
+                          'Account protected',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: Colors.green,
                             fontWeight: FontWeight.w600,
@@ -107,7 +107,7 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
             
             // Authentication Methods
             Text(
-              'Phương thức xác thực',
+              'Authentication methods',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -120,8 +120,8 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
                   _buildSecurityOption(
                     context: context,
                     icon: Icons.fingerprint,
-                    title: 'Vân tay / Face ID',
-                    subtitle: 'Đăng nhập bằng sinh trắc học',
+                    title: 'Fingerprint / Face ID',
+                    subtitle: 'Login with biometric',
                     value: _biometricEnabled,
                     onChanged: (value) {
                       setState(() {
@@ -134,8 +134,8 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
                   _buildSecurityOption(
                     context: context,
                     icon: Icons.verified_user,
-                    title: 'Xác thực 2 yếu tố',
-                    subtitle: 'Bảo mật tài khoản với 2FA',
+                    title: 'Two-factor authentication',
+                    subtitle: 'Secure account with 2FA',
                     value: _twoFactorEnabled,
                     onChanged: (value) {
                       setState(() {
@@ -148,8 +148,8 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
                   _buildSecurityOption(
                     context: context,
                     icon: Icons.lock_clock,
-                    title: 'Tự động khóa',
-                    subtitle: 'Khóa ứng dụng sau 5 phút không hoạt động',
+                    title: 'Auto-lock',
+                    subtitle: 'Lock app after 5 minutes of inactivity',
                     value: _autoLockEnabled,
                     onChanged: (value) {
                       setState(() {
@@ -165,7 +165,7 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
             
             // Password Management
             Text(
-              'Quản lý mật khẩu',
+              'Password management',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -178,23 +178,23 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
                   _buildActionItem(
                     context: context,
                     icon: Icons.lock_reset,
-                    title: 'Đổi mật khẩu',
-                    subtitle: 'Thay đổi mật khẩu tài khoản',
+                    title: 'Change password',
+                    subtitle: 'Change account password',
                     onTap: () => _showChangePasswordDialog(context),
                   ),
                   const Divider(),
                   _buildActionItem(
                     context: context,
                     icon: Icons.visibility,
-                    title: 'Hiển thị mật khẩu',
-                    subtitle: 'Hiển thị mật khẩu khi nhập',
+                    title: 'Show password',
+                    subtitle: 'Show password when entering',
                     onTap: () {
                       setState(() {
                         _showPassword = !_showPassword;
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(_showPassword ? 'Đã bật hiển thị mật khẩu' : 'Đã tắt hiển thị mật khẩu'),
+                          content: Text(_showPassword ? 'Show password enabled' : 'Show password disabled'),
                           backgroundColor: AppThemes.primaryColor,
                         ),
                       );
@@ -217,7 +217,7 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
             
             // Privacy Settings
             Text(
-              'Cài đặt riêng tư',
+                'Privacy settings',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -230,16 +230,16 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
                   _buildActionItem(
                     context: context,
                     icon: Icons.delete_forever,
-                    title: 'Xóa dữ liệu cục bộ',
-                    subtitle: 'Xóa tất cả dữ liệu trên thiết bị',
+                    title: 'Delete local data',
+                    subtitle: 'Delete all data on this device',
                     onTap: () => _showClearDataDialog(context),
                   ),
                   const Divider(),
                   _buildActionItem(
                     context: context,
                     icon: Icons.history,
-                    title: 'Xóa lịch sử hoạt động',
-                    subtitle: 'Xóa lịch sử đăng nhập và hoạt động',
+                    title: 'Delete activity history',
+                    subtitle: 'Delete login and activity history',
                     onTap: () => _showClearHistoryDialog(context),
                   ),
                 ],
@@ -250,7 +250,7 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
             
             // Security Log
             Text(
-              'Nhật ký bảo mật',
+              'Security log',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -264,24 +264,24 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
                   children: [
                     _buildSecurityLogItem(
                       context: context,
-                      title: 'Đăng nhập thành công',
-                      time: 'Hôm nay, 14:30',
+                      title: 'Login successful',
+                      time: 'Today, 14:30',
                       location: 'Hà Nội, Việt Nam',
                       isSuccess: true,
                     ),
                     const SizedBox(height: 12),
                     _buildSecurityLogItem(
                       context: context,
-                      title: 'Đổi mật khẩu',
-                      time: 'Hôm qua, 09:15',
+                      title: 'Change password',
+                      time: 'Yesterday, 09:15',
                       location: 'Hà Nội, Việt Nam',
                       isSuccess: true,
                     ),
                     const SizedBox(height: 12),
                     _buildSecurityLogItem(
                       context: context,
-                      title: 'Đăng nhập từ thiết bị mới',
-                      time: '2 ngày trước, 16:45',
+                      title: 'Login from new device',
+                      time: '2 days ago, 16:45',
                       location: 'TP.HCM, Việt Nam',
                       isSuccess: true,
                     ),
@@ -412,24 +412,24 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Xác thực sinh trắc học'),
-        content: const Text('Bạn có muốn bật đăng nhập bằng vân tay hoặc Face ID?'),
+        title: const Text('Biometric authentication'),
+        content: const Text('Do you want to enable login with fingerprint or Face ID?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Đã bật xác thực sinh trắc học'),
+                  content: Text('Biometric authentication enabled'),
                   backgroundColor: Colors.green,
                 ),
               );
             },
-            child: const Text('Bật'),
+            child: const Text('Enable'),
           ),
         ],
       ),
@@ -440,24 +440,24 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Xác thực 2 yếu tố'),
-        content: const Text('Bạn có muốn bật xác thực 2 yếu tố để tăng cường bảo mật?'),
+        title: const Text('Two-factor authentication'),
+        content: const Text('Do you want to enable two-factor authentication to enhance security?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
+                child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Đã bật xác thực 2 yếu tố'),
+                  content: Text('Two-factor authentication enabled'),
                   backgroundColor: Colors.green,
                 ),
               );
             },
-            child: const Text('Bật'),
+            child: const Text('Enable'),
           ),
         ],
       ),
@@ -468,7 +468,7 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Đổi mật khẩu'),
+        title: const Text('Change password'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -476,7 +476,7 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
               controller: _currentPasswordController,
               obscureText: !_showPassword,
               decoration: const InputDecoration(
-                labelText: 'Mật khẩu hiện tại',
+                labelText: 'Current password',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -485,7 +485,7 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
               controller: _newPasswordController,
               obscureText: !_showPassword,
               decoration: const InputDecoration(
-                labelText: 'Mật khẩu mới',
+                labelText: 'New password',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -494,7 +494,7 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
               controller: _confirmPasswordController,
               obscureText: !_showPassword,
               decoration: const InputDecoration(
-                labelText: 'Xác nhận mật khẩu mới',
+                labelText: 'Confirm new password',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -503,7 +503,7 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: _isChangingPassword ? null : () async {
@@ -515,7 +515,7 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
                     height: 16,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Text('Đổi mật khẩu'),
+                : const Text('Change password'),
           ),
         ],
       ),
@@ -526,7 +526,7 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
     if (_newPasswordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Mật khẩu xác nhận không khớp'),
+          content: Text('Confirm password does not match'),
           backgroundColor: Colors.red,
         ),
       );
@@ -545,7 +545,7 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Đã đổi mật khẩu thành công'),
+            content: Text('Password changed successfully'),
             backgroundColor: Colors.green,
           ),
         );
@@ -559,7 +559,7 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Lỗi đổi mật khẩu: ${e.toString()}'),
+            content: Text('Error changing password: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -577,25 +577,25 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Xóa dữ liệu cục bộ'),
-        content: const Text('Bạn có chắc chắn muốn xóa tất cả dữ liệu trên thiết bị này? Hành động này không thể hoàn tác.'),
+          title: const Text('Delete local data'),
+        content: const Text('Are you sure you want to delete all data on this device? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Đã xóa dữ liệu cục bộ'),
+                  content: Text('Local data deleted'),
                   backgroundColor: Colors.green,
                 ),
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Xóa', style: TextStyle(color: Colors.white)),
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -606,25 +606,25 @@ class _SecuritySettingsScreenState extends ConsumerState<SecuritySettingsScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Xóa lịch sử hoạt động'),
-        content: const Text('Bạn có chắc chắn muốn xóa lịch sử đăng nhập và hoạt động?'),
+        title: const Text('Delete activity history'),
+        content: const Text('Are you sure you want to delete login and activity history?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Đã xóa lịch sử hoạt động'),
+                  content: Text('Activity history deleted'),
                   backgroundColor: Colors.green,
                 ),
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Xóa', style: TextStyle(color: Colors.white)),
+              child: const Text('Delete', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),

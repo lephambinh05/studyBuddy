@@ -35,44 +35,44 @@ class SubjectNotifier extends StateNotifier<SubjectState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
     
     try {
-      print('🔄 SubjectNotifier: Bắt đầu load subjects...');
+      print('🔄 SubjectNotifier: Starting to load subjects...');
       final subjects = await _repository.getAllSubjects();
       
-      print('✅ SubjectNotifier: Load subjects thành công: ${subjects.length} subjects');
+      print('✅ SubjectNotifier: Load subjects successfully: ${subjects.length} subjects');
       state = state.copyWith(
         subjects: subjects,
         isLoading: false,
       );
     } catch (e) {
-      print('❌ SubjectNotifier: Lỗi khi load subjects: $e');
+      print('❌ SubjectNotifier: Error loading subjects: $e');
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Không thể tải danh sách môn học: $e',
+        errorMessage: 'Cannot load subjects: $e',
       );
     }
   }
 
   Future<void> addSubject(SubjectModel subject) async {
     try {
-      print('🔄 SubjectNotifier: Bắt đầu add subject...');
+      print('🔄 SubjectNotifier: Starting to add subject...');
       final subjectId = await _repository.addSubject(subject);
       
       final newSubject = subject.copyWith(id: subjectId);
       final updatedSubjects = [newSubject, ...state.subjects];
       
-      print('✅ SubjectNotifier: Đã thêm subject thành công: ${subject.name}');
+      print('✅ SubjectNotifier: Added subject successfully: ${subject.name}');
       state = state.copyWith(subjects: updatedSubjects);
     } catch (e) {
-      print('❌ SubjectNotifier: Lỗi khi thêm subject: $e');
+      print('❌ SubjectNotifier: Error adding subject: $e');
       state = state.copyWith(
-        errorMessage: 'Không thể thêm môn học: $e',
-      );
+        errorMessage: 'Cannot add subject: $e',
+      );  
     }
   }
 
   Future<void> updateSubject(String subjectId, SubjectModel subject) async {
     try {
-      print('🔄 SubjectNotifier: Bắt đầu update subject...');
+      print('🔄 SubjectNotifier: Starting to update subject...');
       await _repository.updateSubject(subjectId, subject);
       
       final updatedSubjects = state.subjects.map((s) {
@@ -82,46 +82,46 @@ class SubjectNotifier extends StateNotifier<SubjectState> {
         return s;
       }).toList();
       
-      print('✅ SubjectNotifier: Đã cập nhật subject thành công: ${subject.name}');
+      print('✅ SubjectNotifier: Updated subject successfully: ${subject.name}');
       state = state.copyWith(subjects: updatedSubjects);
     } catch (e) {
-      print('❌ SubjectNotifier: Lỗi khi cập nhật subject: $e');
+      print('❌ SubjectNotifier: Error updating subject: $e');
       state = state.copyWith(
-        errorMessage: 'Không thể cập nhật môn học: $e',
+        errorMessage: 'Cannot update subject: $e',
       );
     }
   }
 
   Future<void> deleteSubject(String subjectId) async {
     try {
-      print('🔄 SubjectNotifier: Bắt đầu delete subject...');
+      print('🔄 SubjectNotifier: Starting to delete subject...');
       await _repository.deleteSubject(subjectId);
       
       final updatedSubjects = state.subjects.where((s) => s.id != subjectId).toList();
       
-      print('✅ SubjectNotifier: Đã xóa subject thành công');
+      print('✅ SubjectNotifier: Deleted subject successfully');
       state = state.copyWith(subjects: updatedSubjects);
     } catch (e) {
-      print('❌ SubjectNotifier: Lỗi khi xóa subject: $e');
+      print('❌ SubjectNotifier: Error deleting subject: $e');
       state = state.copyWith(
-        errorMessage: 'Không thể xóa môn học: $e',
+        errorMessage: 'Cannot delete subject: $e',
       );
     }
   }
 
   Future<void> createDefaultSubjects(String userId) async {
     try {
-      print('🔄 SubjectNotifier: Bắt đầu tạo subjects mặc định...');
+      print('🔄 SubjectNotifier: Starting to create default subjects...');
       await _repository.createDefaultSubjects(userId);
       
-      // Reload subjects sau khi tạo mặc định
+      // Reload subjects after creating default
       await loadSubjects();
       
-      print('✅ SubjectNotifier: Đã tạo subjects mặc định thành công');
+      print('✅ SubjectNotifier: Created default subjects successfully');
     } catch (e) {
-      print('❌ SubjectNotifier: Lỗi khi tạo subjects mặc định: $e');
+      print('❌ SubjectNotifier: Error creating default subjects: $e');
       state = state.copyWith(
-        errorMessage: 'Không thể tạo môn học mặc định: $e',
+        errorMessage: 'Cannot create default subjects: $e',
       );
     }
   }
@@ -131,7 +131,7 @@ class SubjectNotifier extends StateNotifier<SubjectState> {
     try {
       return state.subjects.firstWhere((subject) => subject.id == subjectId);
     } catch (e) {
-      print('⚠️ SubjectNotifier: Không tìm thấy subject với ID: $subjectId');
+      print('⚠️ SubjectNotifier: Cannot find subject with ID: $subjectId');
       return null;
     }
   }
@@ -139,7 +139,7 @@ class SubjectNotifier extends StateNotifier<SubjectState> {
   // Lấy tên subject theo ID
   String getSubjectNameById(String subjectId) {
     final subject = getSubjectById(subjectId);
-    return subject?.name ?? 'Không xác định';
+    return subject?.name ?? 'Unknown';
   }
 
   // Lấy danh sách tên subjects
@@ -159,17 +159,17 @@ class SubjectNotifier extends StateNotifier<SubjectState> {
   // Sync dữ liệu từ local storage lên Firebase
   Future<void> syncLocalToFirebase() async {
     try {
-      print('🔄 SubjectNotifier: Bắt đầu sync local to Firebase...');
+      print('🔄 SubjectNotifier: Starting sync local to Firebase...');
       await _repository.syncLocalToFirebase();
       
-      // Reload subjects sau khi sync
+      // Reload subjects after sync
       await loadSubjects();
       
-      print('✅ SubjectNotifier: Hoàn thành sync local to Firebase');
+      print('✅ SubjectNotifier: Sync local to Firebase completed');
     } catch (e) {
-      print('❌ SubjectNotifier: Lỗi khi sync local to Firebase: $e');
+      print('❌ SubjectNotifier: Error syncing local to Firebase: $e');
       state = state.copyWith(
-        errorMessage: 'Không thể đồng bộ dữ liệu: $e',
+        errorMessage: 'Cannot sync data: $e',
       );
     }
   }

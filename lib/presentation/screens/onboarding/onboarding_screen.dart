@@ -17,18 +17,18 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   // Ví dụ về nội dung các trang onboarding
   final List<Widget> _onboardingPages = [
     const OnboardingPageContent(
-      title: "Chào mừng đến StudyBuddy!",
-      description: "Người bạn đồng hành học tập thông minh của bạn. Hãy cùng nhau chinh phục mọi mục tiêu!",
+      title: "Welcome to StudyBuddy!",
+      description: "Your smart study companion. Let's conquer every goal together!",
       imagePath: "assets/images/onboarding_1.png", // TODO: Thay thế bằng hình ảnh của bạn
     ),
     const OnboardingPageContent(
-      title: "Lập kế hoạch dễ dàng",
-      description: "Tạo và quản lý các kế hoạch học tập, theo dõi tiến độ và không bao giờ bỏ lỡ deadline.",
+      title: "Easy Planning",
+      description: "Create and manage study plans, track progress, and never miss a deadline.",
       imagePath: "assets/images/onboarding_2.png", // TODO: Thay thế bằng hình ảnh của bạn
     ),
     const OnboardingPageContent(
-      title: "Nhiệm vụ thông minh",
-      description: "Phân chia mục tiêu lớn thành các nhiệm vụ nhỏ, ưu tiên và hoàn thành chúng một cách hiệu quả.",
+      title: "Smart Tasks",
+      description: "Break down big goals into smaller tasks, prioritize, and get them done efficiently.",
       imagePath: "assets/images/onboarding_3.png", // TODO: Thay thế bằng hình ảnh của bạn
     ),
   ];
@@ -74,7 +74,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   _currentPage != _onboardingPages.length - 1
                       ? TextButton(
                     onPressed: _completeOnboarding,
-                    child: const Text("BỎ QUA"),
+                    child: const Text("SKIP"),
                   )
                       : const SizedBox(width: 70), // Để giữ vị trí cân bằng
 
@@ -102,7 +102,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   _currentPage == _onboardingPages.length - 1
                       ? ElevatedButton(
                     onPressed: _completeOnboarding,
-                    child: const Text("BẮT ĐẦU"),
+                    child: const Text("START"),
                   )
                       : ElevatedButton(
                     onPressed: () {
@@ -111,7 +111,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         curve: Curves.easeInOut,
                       );
                     },
-                    child: const Text("TIẾP"),
+                    child: const Text("NEXT"),
                   ),
                 ],
               ),

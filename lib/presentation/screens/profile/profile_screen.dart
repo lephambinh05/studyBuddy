@@ -7,6 +7,7 @@ import 'package:studybuddy/presentation/providers/auth_provider.dart';
 import 'package:studybuddy/presentation/providers/task_provider.dart';
 import 'package:studybuddy/presentation/providers/subject_provider.dart';
 import 'package:studybuddy/presentation/providers/study_target_provider.dart';
+import 'package:studybuddy/presentation/providers/theme_provider.dart';
 import 'package:studybuddy/presentation/widgets/study_target/study_target_form_dialog.dart';
 import 'package:studybuddy/data/models/study_target.dart';
 import 'package:studybuddy/presentation/screens/settings/sync_settings_screen.dart';
@@ -170,7 +171,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                        user?.displayName ?? 
                        firebaseUser?.displayName ?? 
                        firebaseUser?.email?.split('@').first ?? 
-                       'Người dùng';
+                       'User';
     final email = appUser?.email ?? 
                   user?.email ?? 
                   firebaseUser?.email ?? '';
@@ -259,7 +260,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                 context: context,
                 icon: Icons.star,
                 value: 'Level ${(consecutiveDays / 7).floor() + 1}',
-                label: 'Cấp độ',
+                label: 'Level',
                 color: Colors.white,
               ),
               Container(
@@ -272,7 +273,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                 context: context,
                 icon: Icons.emoji_events,
                 value: '${consecutiveDays}',
-                label: 'Ngày liên tiếp',
+                label: 'Consecutive days of study',
                 color: Colors.white,
               ),
             ],
@@ -296,7 +297,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Thống kê học tập',
+          'Analytics',
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -307,7 +308,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
             Expanded(
               child: _buildStatCard(
                 context: context,
-                title: 'Bài tập hoàn thành',
+                title: 'Completed tasks',
                 value: '$completedTasks/$totalTasks',
                 icon: Icons.check_circle,
                 color: AppThemes.accentColor,
@@ -317,7 +318,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
             Expanded(
               child: _buildStatCard(
                 context: context,
-                title: 'Ngày học liên tiếp',
+                title: 'Consecutive days of study',
                 value: '$consecutiveDays',
                 icon: Icons.local_fire_department,
                 color: AppThemes.warningColor,
@@ -331,7 +332,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
             Expanded(
               child: _buildStatCard(
                 context: context,
-                title: 'Tỷ lệ hoàn thành',
+                title: 'Completion rate',
                 value: '${(completionRate * 100).toStringAsFixed(1)}%',
                 icon: Icons.schedule,
                 color: AppThemes.primaryColor,
@@ -341,7 +342,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
             Expanded(
               child: _buildStatCard(
                 context: context,
-                title: 'Bài tập còn lại',
+                title: 'Remaining tasks',
                 value: '${totalTasks - completedTasks}',
                 icon: Icons.trending_up,
                 color: AppThemes.secondaryColor,
@@ -404,7 +405,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Thành tích',
+          'Achievements',
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -452,15 +453,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
               _buildSettingItem(
                 context: context,
                 icon: Icons.notifications,
-                title: 'Thông báo',
-                subtitle: 'Bật thông báo cho bài tập',
+                title: 'Notifications',
+                subtitle: 'Enable notifications for tasks',
                 trailing: Switch(
                   value: true,
                   onChanged: (value) {
                     // TODO: Implement notification toggle
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Thông báo ${value ? 'đã bật' : 'đã tắt'}'),
+                        content: Text('Notifications ${value ? 'enabled' : 'disabled'}'),
                         backgroundColor: AppThemes.primaryColor,
                       ),
                     );
@@ -472,36 +473,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
               _buildSettingItem(
                 context: context,
                 icon: Icons.dark_mode,
-                title: 'Chế độ tối',
-                subtitle: 'Chuyển đổi giao diện',
+                title: 'Dark mode',
+                subtitle: 'Switch between light and dark mode',
                 trailing: Switch(
                   value: theme.brightness == Brightness.dark,
                   onChanged: (value) {
-                    // Toggle theme mode
+                    // Toggle theme mode using theme provider instead of Navigator
                     final currentMode = Theme.of(context).brightness;
                     final newMode = currentMode == Brightness.light ? Brightness.dark : Brightness.light;
                     
-                    // Update theme using Navigator
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                        builder: (context) => Theme(
-                          data: newMode == Brightness.dark 
-                            ? ThemeData.dark().copyWith(
-                                primaryColor: AppThemes.primaryColor,
-                                scaffoldBackgroundColor: Colors.grey[900],
-                              )
-                            : ThemeData.light().copyWith(
-                                primaryColor: AppThemes.primaryColor,
-                                scaffoldBackgroundColor: Colors.white,
-                              ),
-                          child: const ProfileScreen(),
-                        ),
-                      ),
-                    );
+                    // Use theme provider to update theme
+                    ref.read(themeProvider.notifier).toggleTheme();
                     
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Chế độ tối ${value ? 'đã bật' : 'đã tắt'}'),
+                        content: Text('Dark mode ${value ? 'enabled' : 'disabled'}'),
                         backgroundColor: AppThemes.primaryColor,
                       ),
                     );
@@ -513,8 +499,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
               _buildSettingItem(
                 context: context,
                 icon: Icons.sync,
-                title: 'Đồng bộ dữ liệu',
-                subtitle: 'Đồng bộ với tài khoản',
+                title: 'Sync data',
+                subtitle: 'Sync with account',
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () {
                   Navigator.push(
@@ -529,8 +515,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
               _buildSettingItem(
                 context: context,
                 icon: Icons.security,
-                title: 'Bảo mật',
-                subtitle: 'Đổi mật khẩu, xác thực 2FA',
+                title: 'Security',
+                subtitle: 'Change password, 2FA',
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () {
                   Navigator.push(
@@ -545,8 +531,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
               _buildSettingItem(
                 context: context,
                 icon: Icons.notifications,
-                title: 'Thông báo',
-                subtitle: 'Cài đặt thông báo',
+                title: 'Notifications',
+                subtitle: 'Settings for notifications',
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () {
                   Navigator.push(
@@ -561,8 +547,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
               _buildSettingItem(
                 context: context,
                 icon: Icons.logout,
-                title: 'Đăng xuất',
-                subtitle: 'Đăng xuất khỏi tài khoản',
+                title: 'Logout',
+                subtitle: 'Logout from account',
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () {
                   _showLogoutDialog(context);
@@ -586,7 +572,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Mục tiêu học tập',
+              'Study goals',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -599,7 +585,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                 );
               },
               icon: const Icon(Icons.add_circle, color: AppThemes.primaryColor),
-              tooltip: 'Thêm mục tiêu mới',
+              tooltip: 'Add new goal',
             ),
           ],
         ),
@@ -617,14 +603,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Chưa có mục tiêu nào',
+                    'No goals yet',
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: Colors.grey.shade600,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Nhấn nút + để tạo mục tiêu học tập mới',
+                    'Tap the + button to create a new study goal',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: Colors.grey.shade500,
                     ),
@@ -707,7 +693,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                       children: [
                         Icon(Icons.edit, size: 16),
                         SizedBox(width: 8),
-                        Text('Chỉnh sửa'),
+                        Text('Edit'),
                       ],
                     ),
                   ),
@@ -717,7 +703,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                       children: [
                         Icon(Icons.delete, size: 16, color: Colors.red),
                         SizedBox(width: 8),
-                        Text('Xóa', style: TextStyle(color: Colors.red)),
+                        Text('Delete', style: TextStyle(color: Colors.red)),
                       ],
                     ),
                   ),
@@ -748,7 +734,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
               ),
               if (target.endDate != null && daysRemaining >= 0)
                 Text(
-                  'Còn $daysRemaining ngày',
+                  'Remaining $daysRemaining days',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: daysRemaining <= 7 ? Colors.orange : Colors.grey.shade600,
                   ),
@@ -776,12 +762,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Xóa mục tiêu'),
-        content: Text('Bạn có chắc chắn muốn xóa mục tiêu "${target.title}"?'),
+        title: const Text('Delete goal'),
+        content: Text('Are you sure you want to delete the goal "${target.title}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -792,7 +778,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Đã xóa mục tiêu'),
+                      content: Text('Goal has been deleted'),
                       backgroundColor: AppThemes.primaryColor,
                     ),
                   );
@@ -802,7 +788,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Lỗi: ${e.toString()}'),
+                      content: Text('Error: ${e.toString()}'),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -810,7 +796,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Xóa', style: TextStyle(color: Colors.white)),
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -1035,27 +1021,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Chỉnh sửa hồ sơ'),
+        title: const Text('Edit profile'),
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               decoration: InputDecoration(
-                labelText: 'Họ và tên',
+                labelText: 'Full name',
                 border: OutlineInputBorder(),
               ),
             ),
             SizedBox(height: 16),
             TextField(
               decoration: InputDecoration(
-                labelText: 'Lớp',
+                labelText: 'Class',
                 border: OutlineInputBorder(),
               ),
             ),
             SizedBox(height: 16),
             TextField(
               decoration: InputDecoration(
-                labelText: 'Trường',
+                labelText: 'School',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -1064,14 +1050,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               // TODO: Save profile changes
             },
-            child: const Text('Lưu'),
+            child: const Text('Save'),
           ),
         ],
       ),
@@ -1082,19 +1068,38 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Đăng xuất'),
-        content: const Text('Bạn có chắc chắn muốn đăng xuất khỏi tài khoản?'),
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout from your account?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              // TODO: Implement logout logic
+              try {
+                await ref.read(authNotifierProvider.notifier).signOut();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Logout successful'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Logout error: ${e.toString()}'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
             },
-            child: const Text('Đăng xuất'),
+            child: const Text('Logout'),
           ),
         ],
       ),

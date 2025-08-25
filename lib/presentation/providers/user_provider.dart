@@ -40,74 +40,45 @@ class UserNotifier extends StateNotifier<UserState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
     
     try {
-      print('🔄 UserNotifier: Bắt đầu load current user...');
+      print('🔄 UserNotifier: Starting to load current user...');
       final user = await _repository.getCurrentUser();
       
       if (user != null) {
-        print('✅ UserNotifier: Load user thành công: ${user.displayName}');
+        print('✅ UserNotifier: Load user successfully: ${user.displayName}');
         state = state.copyWith(
           user: user,
           consecutiveDays: user.consecutiveDays,
           isLoading: false,
         );
       } else {
-        print('⚠️ UserNotifier: Không tìm thấy user, tạo user mới...');
-        // Tạo user mới nếu chưa có
-        await _createNewUser();
-      }
-    } catch (e) {
-      print('❌ UserNotifier: Lỗi khi load user: $e');
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: 'Không thể tải thông tin người dùng: $e',
-      );
-    }
-  }
-
-  Future<void> _createNewUser() async {
-    try {
-      final auth = FirebaseAuth.instance;
-      final currentUser = auth.currentUser;
-      
-      if (currentUser != null) {
-        final newUser = UserModel(
-          id: currentUser.uid,
-          uid: currentUser.uid,
-          email: currentUser.email,
-          displayName: currentUser.displayName,
-          photoUrl: currentUser.photoURL,
-          lastLogin: DateTime.now(),
-          createdAt: DateTime.now(),
-          consecutiveDays: 0,
-        );
-
-        await _repository.createOrUpdateUser(newUser);
-        print('✅ UserNotifier: Đã tạo user mới: ${newUser.displayName}');
-        
+        print('⚠️ UserNotifier: Cannot find user, user not authenticated');
+        // Không tạo user mới khi không tìm thấy user
         state = state.copyWith(
-          user: newUser,
-          consecutiveDays: 0,
+          user: null,
           isLoading: false,
+          errorMessage: 'User not authenticated',
         );
       }
     } catch (e) {
-      print('❌ UserNotifier: Lỗi khi tạo user mới: $e');
+      print('❌ UserNotifier: Error loading user: $e');
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Không thể tạo người dùng mới: $e',
+        errorMessage: 'Cannot load user information: $e',
       );
     }
   }
+
+
 
   Future<void> updateConsecutiveDays() async {
     try {
-      print('🔄 UserNotifier: Cập nhật consecutive days...');
+      print('🔄 UserNotifier: Updating consecutive days...');
       await _repository.updateConsecutiveDays();
       
-      // Reload user để lấy thông tin mới
+      // Reload user to get new information
       await loadCurrentUser();
     } catch (e) {
-      print('❌ UserNotifier: Lỗi khi cập nhật consecutive days: $e');
+      print('❌ UserNotifier: Error updating consecutive days: $e');
     }
   }
 
@@ -117,7 +88,7 @@ class UserNotifier extends StateNotifier<UserState> {
       state = state.copyWith(consecutiveDays: days);
       return days;
     } catch (e) {
-      print('❌ UserNotifier: Lỗi khi lấy consecutive days: $e');
+        print('❌ UserNotifier: Error getting consecutive days: $e');
       return 0;
     }
   }

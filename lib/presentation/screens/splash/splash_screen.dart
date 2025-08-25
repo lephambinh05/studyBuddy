@@ -17,7 +17,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   void initState() {
     super.initState();
     _checkAuthStatusAndNavigate();
-  }
+  } 
 
   Future<void> _checkAuthStatusAndNavigate() async {
     // Đợi một chút để logo hiển thị hoặc cho các services khởi tạo

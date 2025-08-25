@@ -49,10 +49,13 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         _nameController.text.trim(),
       );
 
-      if (mounted) {
+      // Kiểm tra trạng thái authentication sau khi đăng ký
+      final authState = ref.read(authNotifierProvider);
+      
+      if (mounted && authState.status == AuthStatus.authenticated) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Đăng ký thành công!'),
+            content: Text('Register successfully!'),
             backgroundColor: Colors.green,
           ),
         );
@@ -65,7 +68,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Đăng ký thất bại: ${e.toString()}'),
+            content: Text('Register failed: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -95,13 +98,17 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Đăng ký'),
+        title: const Text('Register'),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+                 leading: IconButton(
+           icon: const Icon(Icons.arrow_back),
+           onPressed: () {
+             // Xóa error message trước khi quay lại
+             ref.read(authNotifierProvider.notifier).clearError();
+             Navigator.of(context).pop();
+           },
+         ),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -154,7 +161,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Tạo tài khoản mới',
+                          'Create new account',
                           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: AppThemes.primaryColor,
@@ -162,7 +169,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Tham gia StudyBuddy ngay hôm nay',
+                          'Join StudyBuddy today',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Colors.grey[600],
                           ),
@@ -226,7 +233,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           // Grade field
                           AuthFormField(
                             controller: _gradeController,
-                            labelText: 'Lớp (tùy chọn)',
+                            labelText: 'Class (optional)',
                             prefixIcon: Icons.grade_outlined,
                           ),
                           const SizedBox(height: 16),
@@ -234,7 +241,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           // School field
                           AuthFormField(
                             controller: _schoolController,
-                            labelText: 'Trường (tùy chọn)',
+                            labelText: 'School (optional)',
                             prefixIcon: Icons.school_outlined,
                           ),
                           const SizedBox(height: 16),
@@ -243,7 +250,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           AuthFormField(
                             controller: _passwordController,
                             obscureText: _obscurePassword,
-                            labelText: 'Mật khẩu',
+                            labelText: 'Password',
                             prefixIcon: Icons.lock_outlined,
                             suffixIcon: IconButton(
                               icon: Icon(
@@ -271,7 +278,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           AuthFormField(
                             controller: _confirmPasswordController,
                             obscureText: _obscureConfirmPassword,
-                            labelText: 'Xác nhận mật khẩu',
+                            labelText: 'Confirm password',
                             prefixIcon: Icons.lock_outlined,
                             suffixIcon: IconButton(
                               icon: Icon(
@@ -285,10 +292,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Vui lòng xác nhận mật khẩu';
+                                return 'Please confirm password';
                               }
                               if (value != _passwordController.text) {
-                                return 'Mật khẩu không khớp';
+                                return 'Password does not match';
                               }
                               return null;
                             },
@@ -316,7 +323,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                                     ),
                                   )
                                 : const Text(
-                                    'Đăng ký',
+                                    'Register',
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -330,13 +337,17 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                'Đã có tài khoản? ',
+                                'Already have an account? ',
                                 style: TextStyle(color: Colors.grey[600]),
                               ),
-                              TextButton(
-                                onPressed: () => Navigator.of(context).pop(),
+                                                             TextButton(
+                                 onPressed: () {
+                                   // Xóa error message trước khi quay lại
+                                   ref.read(authNotifierProvider.notifier).clearError();
+                                   Navigator.of(context).pop();
+                                 },
                                 child: Text(
-                                  'Đăng nhập',
+                                    'Login',
                                   style: TextStyle(
                                     color: AppThemes.primaryColor,
                                     fontWeight: FontWeight.bold,

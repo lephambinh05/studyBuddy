@@ -51,7 +51,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Đã cập nhật cài đặt thông báo'),
+            content: Text('Notification settings updated'),
             backgroundColor: AppThemes.primaryColor,
           ),
         );
@@ -60,7 +60,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Lỗi cập nhật cài đặt: ${e.toString()}'),
+            content: Text('Error updating notification settings: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -74,7 +74,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cài đặt thông báo'),
+        title: const Text('Notification settings'),
         backgroundColor: AppThemes.primaryColor,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -88,7 +88,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                 children: [
                   // Smart Notifications Section
                   Text(
-                    'Thông báo thông minh',
+                    'Smart notifications',
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -101,8 +101,8 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                         _buildNotificationOption(
                           context: context,
                           icon: Icons.psychology,
-                          title: 'Thông báo thông minh',
-                          subtitle: 'Thông báo dựa trên hành vi học tập',
+                          title: 'Smart notifications',
+                          subtitle: 'Notifications based on study behavior',
                           value: _smartNotificationsEnabled,
                           onChanged: (value) {
                             setState(() {
@@ -115,8 +115,8 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                         _buildNotificationOption(
                           context: context,
                           icon: Icons.trending_up,
-                          title: 'Thông báo dựa trên hành vi',
-                          subtitle: 'Phân tích hành vi để gửi thông báo phù hợp',
+                          title: 'Behavior-based notifications',
+                          subtitle: 'Analyze behavior to send appropriate notifications',
                           value: _behaviorBasedNotificationsEnabled,
                           onChanged: (value) {
                             setState(() {
@@ -133,7 +133,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                   
                   // Notification Types Section
                   Text(
-                    'Loại thông báo',
+                    'Notification types',
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -146,8 +146,8 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                         _buildNotificationOption(
                           context: context,
                           icon: Icons.task,
-                          title: 'Nhắc nhở bài tập',
-                          subtitle: 'Thông báo deadline và bài tập sắp đến hạn',
+                          title: 'Task reminders',
+                          subtitle: 'Notifications for deadlines and upcoming tasks',
                           value: _notificationPreferences['task_reminders'] ?? true,
                           onChanged: (value) => _updateNotificationPreference('task_reminders', value),
                         ),
@@ -155,8 +155,8 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                         _buildNotificationOption(
                           context: context,
                           icon: Icons.event,
-                          title: 'Nhắc nhở sự kiện',
-                          subtitle: 'Thông báo về lịch học và sự kiện',
+                          title: 'Event reminders',
+                          subtitle: 'Notifications for study schedules and events',
                           value: _notificationPreferences['event_reminders'] ?? true,
                           onChanged: (value) => _updateNotificationPreference('event_reminders', value),
                         ),
@@ -164,8 +164,8 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                         _buildNotificationOption(
                           context: context,
                           icon: Icons.emoji_events,
-                          title: 'Thông báo thành tích',
-                          subtitle: 'Thông báo khi đạt được thành tích mới',
+                          title: 'Achievement notifications',
+                          subtitle: 'Notifications when new achievements are reached',
                           value: _notificationPreferences['achievement_notifications'] ?? true,
                           onChanged: (value) => _updateNotificationPreference('achievement_notifications', value),
                         ),
@@ -173,8 +173,8 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                         _buildNotificationOption(
                           context: context,
                           icon: Icons.school,
-                          title: 'Nhắc nhở học tập',
-                          subtitle: 'Thông báo nhắc nhở học tập định kỳ',
+                          title: 'Study reminders',
+                          subtitle: 'Periodic study reminders',
                           value: _notificationPreferences['study_reminders'] ?? true,
                           onChanged: (value) => _updateNotificationPreference('study_reminders', value),
                         ),
@@ -182,8 +182,8 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                         _buildNotificationOption(
                           context: context,
                           icon: Icons.favorite,
-                          title: 'Tin nhắn động lực',
-                          subtitle: 'Tin nhắn khuyến khích và động lực học tập',
+                          title: 'Motivational messages',
+                          subtitle: 'Motivational messages and encouragement',
                           value: _notificationPreferences['motivational_messages'] ?? true,
                           onChanged: (value) => _updateNotificationPreference('motivational_messages', value),
                         ),
@@ -191,8 +191,8 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                         _buildNotificationOption(
                           context: context,
                           icon: Icons.warning,
-                          title: 'Cảnh báo deadline',
-                          subtitle: 'Cảnh báo khi deadline sắp đến',
+                          title: 'Deadline warnings',
+                          subtitle: 'Warnings when deadlines are approaching',
                           value: _notificationPreferences['deadline_warnings'] ?? true,
                           onChanged: (value) => _updateNotificationPreference('deadline_warnings', value),
                         ),
@@ -204,7 +204,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                   
                   // Notification Schedule Section
                   Text(
-                    'Lịch thông báo',
+                      'Notification schedule',
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -226,7 +226,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                'Thời gian thông báo',
+                                'Notification time',
                                 style: theme.textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -235,7 +235,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Thông báo sẽ được gửi trong khoảng thời gian phù hợp:',
+                            'Notifications will be sent at the appropriate time:',
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: Colors.grey.shade600,
                             ),
@@ -244,25 +244,25 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                           _buildTimeRangeItem(
                             context: context,
                             icon: Icons.wb_sunny,
-                            title: 'Buổi sáng',
+                            title: 'Morning',
                             time: '8:00 - 12:00',
-                            description: 'Thông báo động lực và nhắc nhở học tập',
+                            description: 'Motivational messages and study reminders',
                           ),
                           const SizedBox(height: 8),
                           _buildTimeRangeItem(
                             context: context,
                             icon: Icons.wb_cloudy,
-                            title: 'Buổi chiều',
+                            title: 'Afternoon',
                             time: '14:00 - 18:00',
-                            description: 'Nhắc nhở deadline và bài tập',
+                            description: 'Deadline reminders and task reminders',
                           ),
                           const SizedBox(height: 8),
                           _buildTimeRangeItem(
                             context: context,
                             icon: Icons.nightlight,
-                            title: 'Buổi tối',
+                            title: 'Evening',
                             time: '19:00 - 22:00',
-                            description: 'Tóm tắt ngày và kế hoạch ngày mai',
+                            description: 'Daily summary and tomorrow\'s plan',
                           ),
                         ],
                       ),
@@ -273,7 +273,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                   
                   // Test Notifications Section
                   Text(
-                    'Kiểm tra thông báo',
+                    'Test notifications',
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -286,24 +286,24 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                         _buildActionItem(
                           context: context,
                           icon: Icons.notifications,
-                          title: 'Gửi thông báo test',
-                          subtitle: 'Gửi thông báo để kiểm tra cài đặt',
+                          title: 'Send test notification',
+                          subtitle: 'Send a test notification to check settings',
                           onTap: _sendTestNotification,
                         ),
                         const Divider(),
                         _buildActionItem(
                           context: context,
                           icon: Icons.school,
-                          title: 'Gửi nhắc nhở học tập',
-                          subtitle: 'Gửi thông báo nhắc nhở học tập',
+                          title: 'Send study reminder',
+                          subtitle: 'Send a study reminder',
                           onTap: _sendStudyReminder,
                         ),
                         const Divider(),
                         _buildActionItem(
                           context: context,
                           icon: Icons.favorite,
-                          title: 'Gửi tin nhắn động lực',
-                          subtitle: 'Gửi tin nhắn khuyến khích học tập',
+                          title: 'Send motivational message',
+                          subtitle: 'Send a motivational message',
                           onTap: _sendMotivationalMessage,
                         ),
                       ],
@@ -429,8 +429,8 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
       final user = NotificationService.getUserBehavior();
       await NotificationService.sendNotificationToUser(
         userId: user['userId'] ?? '',
-        title: '🧪 Thông báo test',
-        body: 'Đây là thông báo test để kiểm tra cài đặt!',
+        title: '🧪 Test notification',
+        body: 'This is a test notification to check settings!',
         data: {
           'type': 'test_notification',
           'timestamp': DateTime.now().toIso8601String(),
@@ -440,7 +440,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Đã gửi thông báo test!'),
+            content: Text('Test notification sent!'),
             backgroundColor: Colors.green,
           ),
         );
@@ -449,7 +449,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Lỗi gửi thông báo: ${e.toString()}'),
+            content: Text('Error sending notification: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -467,7 +467,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Đã gửi nhắc nhở học tập!'),
+            content: Text('Study reminder sent!'),
             backgroundColor: Colors.green,
           ),
         );
@@ -476,7 +476,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Lỗi gửi nhắc nhở: ${e.toString()}'),
+            content: Text('Error sending study reminder: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -489,13 +489,13 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
       final user = NotificationService.getUserBehavior();
       await NotificationService.sendMotivationalMessage(
         userId: user['userId'] ?? '',
-        message: 'Hôm nay là một ngày tuyệt vời để học tập và phát triển! 💪',
+        message: 'Today is a great day to study and develop! 💪',
       );
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Đã gửi tin nhắn động lực!'),
+            content: Text('Motivational message sent!'),
             backgroundColor: Colors.green,
           ),
         );
@@ -504,7 +504,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Lỗi gửi tin nhắn: ${e.toString()}'),
+            content: Text('Error sending motivational message: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );

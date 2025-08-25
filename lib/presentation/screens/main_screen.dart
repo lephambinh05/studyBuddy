@@ -79,13 +79,14 @@ class _MainScreenState extends ConsumerState<MainScreen>
   Widget? _buildFloatingActionButton() {
     if (_currentIndex != 0) return null;
     
-    return FloatingActionButton(
+    return FloatingActionButton.extended(
       heroTag: 'main_fab',
       onPressed: () {
         _showAddTaskDialog(context);
       },
       backgroundColor: AppThemes.primaryColor,
-      child: const Icon(Icons.add, color: Colors.white),
+      icon: const Icon(Icons.add, color: Colors.white),
+      label: const Text('Add Task', style: TextStyle(color: Colors.white)),
     );
   }
 
@@ -93,15 +94,29 @@ class _MainScreenState extends ConsumerState<MainScreen>
     showDialog(
       context: context,
       builder: (context) => TaskFormDialog(
-        onSave: (task) {
-          // Handle task save
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Đã thêm bài tập thành công!'),
-              backgroundColor: Colors.green,
-            ),
-          );
+        onSave: (task) async {
+          try {
+            await ref.read(taskProvider.notifier).addTask(task);
+            if (context.mounted) {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Added task "${task.title}"'),
+                  backgroundColor: AppThemes.primaryColor,
+                ),
+              );
+            }
+          } catch (e) {
+            if (context.mounted) {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Cannot add task. Please try again later.'),
+                  backgroundColor: AppThemes.errorColor,
+                ),
+              );
+            }
+          }
         },
       ),
     );
@@ -112,12 +127,12 @@ class _MainScreenState extends ConsumerState<MainScreen>
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Đăng xuất'),
-          content: const Text('Bạn có chắc chắn muốn đăng xuất?'),
+          title: const Text('Logout'),
+          content: const Text('Are you sure you want to logout?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Hủy'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () async {
@@ -127,7 +142,7 @@ class _MainScreenState extends ConsumerState<MainScreen>
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Đăng xuất thành công'),
+                        content: Text('Logout successfully'),
                         backgroundColor: Colors.green,
                       ),
                     );
@@ -136,14 +151,14 @@ class _MainScreenState extends ConsumerState<MainScreen>
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Lỗi đăng xuất: ${e.toString()}'),
+                        content: Text('Error logging out: ${e.toString()}'),
                         backgroundColor: Colors.red,
                       ),
                     );
                   }
                 }
               },
-              child: const Text('Đăng xuất'),
+              child: const Text('Logout'),
             ),
           ],
         );
@@ -172,28 +187,28 @@ class _MainScreenState extends ConsumerState<MainScreen>
               _buildNavItem(
                 context: context,
                 icon: Icons.dashboard,
-                label: 'Trang chủ',
+                label: 'Home',
                 index: 0,
                 isSelected: _currentIndex == 0,
               ),
               _buildNavItem(
                 context: context,
                 icon: Icons.assignment,
-                label: 'Bài tập',
+                label: 'Tasks',
                 index: 1,
                 isSelected: _currentIndex == 1,
               ),
               _buildNavItem(
                 context: context,
                 icon: Icons.calendar_today,
-                label: 'Lịch',
+                label: 'Calendar',
                 index: 2,
                 isSelected: _currentIndex == 2,
               ),
               _buildNavItem(
                 context: context,
                 icon: Icons.person,
-                label: 'Hồ sơ',
+                  label: 'Profile',
                 index: 3,
                 isSelected: _currentIndex == 3,
               ),

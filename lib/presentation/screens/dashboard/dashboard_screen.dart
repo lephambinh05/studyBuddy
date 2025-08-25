@@ -105,7 +105,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                     // TODO: Navigate to notifications screen when available
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Tính năng thông báo sẽ có sẵn sớm!'),
+                        content: Text('Notification feature will be available soon!'),
                         duration: Duration(seconds: 2),
                       ),
                     );
@@ -186,13 +186,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           ],
         ),
       ),
-             floatingActionButton: FloatingActionButton.extended(
-         heroTag: 'dashboard_fab',
-         onPressed: () => _showAddTaskDialog(context),
-         icon: const Icon(Icons.add),
-                         label: const Text('Add Task'),
-         backgroundColor: AppThemes.primaryColor,
-       ),
+      floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'dashboard_fab',
+        onPressed: () => _showAddTaskDialog(context),
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text('Add Task', style: TextStyle(color: Colors.white)),
+        backgroundColor: AppThemes.primaryColor,
+      ),
     );
   }
 
@@ -203,11 +203,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     String greeting;
     
     if (hour < 12) {
-      greeting = 'Chào buổi sáng';
+      greeting = 'Good morning';
     } else if (hour < 17) {
-      greeting = 'Chào buổi chiều';
+      greeting = 'Good afternoon';
     } else {
-      greeting = 'Chào buổi tối';
+      greeting = 'Good evening';
     }
     
     return GradientCard(
@@ -239,7 +239,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       ),
                     ),
                     Text(
-                      'Hãy bắt đầu học tập ngay hôm nay!',
+                      'Start studying today!',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: Colors.white.withOpacity(0.9),
                       ),
@@ -257,7 +257,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                   context: context,
                   icon: Icons.assignment,
                   value: taskState.statistics['totalTasks']?.toString() ?? '0',
-                  label: 'Bài tập',
+                  label: 'Tasks',
                   color: Colors.white,
                 ),
               ),
@@ -266,7 +266,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                   context: context,
                   icon: Icons.check_circle,
                   value: taskState.statistics['completedTasks']?.toString() ?? '0',
-                  label: 'Hoàn thành',
+                  label: 'Completed',
                   color: Colors.white,
                 ),
               ),
@@ -275,7 +275,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                   context: context,
                   icon: Icons.schedule,
                   value: taskState.statistics['pendingTasks']?.toString() ?? '0',
-                  label: 'Remaining',
+                  label: 'Pending',
                   color: Colors.white,
                 ),
               ),
@@ -302,7 +302,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Quick Statistics',
+          'Quick Stats',
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -316,7 +316,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                   context: context,
                   icon: Icons.trending_up,
                   value: '${completionPercentage}%',
-                  label: 'Progress',
+                  label: 'Completion Rate',
                   color: AppThemes.accentColor,
                 ),
               ),
@@ -328,7 +328,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                   context: context,
                   icon: Icons.local_fire_department,
                   value: '$consecutiveDays',
-                  label: 'Consecutive Days',
+                  label: 'Consecutive Days of Study',
                   color: AppThemes.warningColor,
                 ),
               ),
@@ -355,14 +355,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Today\'s Tasks',
+              'Today\'s tasks',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             TextButton(
               onPressed: () {
-                // TODO: Navigate to all tasks
+                // Navigate to tasks screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TasksScreen(),
+                  ),
+                );
               },
               child: const Text('View All'),
             ),
@@ -524,7 +530,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Thao tác nhanh',
+          'Quick actions',
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -536,7 +542,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                              child: _buildActionButton(
                  context: context,
                  icon: Icons.add_task,
-                 label: 'Thêm bài tập',
+                 label: 'Add task',
                  color: AppThemes.primaryColor,
                  onTap: () => _showAddTaskDialog(context),
                ),
@@ -546,7 +552,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               child: _buildActionButton(
                 context: context,
                 icon: Icons.calendar_today,
-                label: 'Lịch học',
+                label: 'Calendar',
                 color: AppThemes.secondaryColor,
                 onTap: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => const CalendarScreen()));
@@ -562,7 +568,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               child: _buildActionButton(
                 context: context,
                 icon: Icons.analytics,
-                label: 'Thống kê',
+                label: 'Analytics',
                 color: AppThemes.accentColor,
                 onTap: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => const TasksScreen()));
@@ -574,7 +580,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               child: _buildActionButton(
                 context: context,
                 icon: Icons.settings,
-                label: 'Cài đặt',
+                label: 'Settings',
                 color: AppThemes.warningColor,
                 onTap: () {
                   print('🔧 Settings button tapped');
@@ -779,7 +785,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Bài tập đã được thêm thành công!'),
+              content: const Text('Task has been added successfully!'),
               backgroundColor: AppThemes.primaryColor,
             ),
           );

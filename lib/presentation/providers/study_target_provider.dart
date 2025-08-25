@@ -279,17 +279,17 @@ class StudyTargetNotifier extends StateNotifier<StudyTargetState> {
   // Sync dữ liệu từ local storage lên Firebase
   Future<void> syncLocalToFirebase() async {
     try {
-      print('🔄 StudyTargetNotifier: Bắt đầu sync local to Firebase...');
+      print('🔄 StudyTargetNotifier: Starting sync local to Firebase...');
       await _repository.syncLocalToFirebase();
       
-      // Reload study targets sau khi sync
+      // Reload study targets after sync
       await loadStudyTargets();
       
-      print('✅ StudyTargetNotifier: Hoàn thành sync local to Firebase');
+      print('✅ StudyTargetNotifier: Sync local to Firebase completed');
     } catch (e) {
-      print('❌ StudyTargetNotifier: Lỗi khi sync local to Firebase: $e');
+      print('❌ StudyTargetNotifier: Error syncing local to Firebase: $e');
       state = state.copyWith(
-        error: 'Không thể đồng bộ dữ liệu: $e',
+        error: 'Cannot sync data: $e',
       );
     }
   }

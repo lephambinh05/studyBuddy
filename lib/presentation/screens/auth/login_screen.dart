@@ -38,7 +38,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         _passwordController.text,
       );
 
-      if (mounted) {
+      // Kiểm tra trạng thái authentication sau khi đăng nhập
+      final authState = ref.read(authNotifierProvider);
+      
+      if (mounted && authState.status == AuthStatus.authenticated) {
+        // Chỉ chuyển trang khi đăng nhập thành công
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const MainScreen()),
         );
@@ -47,7 +51,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Đăng nhập thất bại: ${e.toString()}'),
+            content: Text('Login failed: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -73,7 +77,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Email reset password đã được gửi'),
+            content: Text('Email reset password has been sent'),
             backgroundColor: Colors.green,
           ),
         );
@@ -82,7 +86,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Lỗi gửi email: ${e.toString()}'),
+            content: Text('Error sending email: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -167,7 +171,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Đăng nhập để tiếp tục',
+                          'Login to continue',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Colors.grey[600],
                           ),
@@ -207,7 +211,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 return 'Please enter email';
                               }
                               if (!value.contains('@')) {
-                                return 'Email không hợp lệ';
+                                return 'Invalid email';
                               }
                               return null;
                             },
@@ -217,7 +221,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           // Password field
                           AuthFormField(
                             controller: _passwordController,
-                            labelText: 'Mật khẩu',
+                            labelText: 'Password',
                             prefixIcon: Icons.lock_outlined,
                             obscureText: _obscurePassword,
                             suffixIcon: IconButton(
@@ -248,7 +252,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             child: TextButton(
                               onPressed: _resetPassword,
                               child: Text(
-                                'Quên mật khẩu?',
+                                'Forgot password?',
                                 style: TextStyle(color: AppThemes.primaryColor),
                               ),
                             ),
@@ -276,7 +280,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     ),
                                   )
                                 : const Text(
-                                    'Đăng nhập',
+                                    'Login',
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -290,11 +294,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                'Chưa có tài khoản? ',
+                                  'No account? ',
                                 style: TextStyle(color: Colors.grey[600]),
                               ),
                               TextButton(
                                 onPressed: () {
+                                  // Xóa error message trước khi chuyển trang
+                                  ref.read(authNotifierProvider.notifier).clearError();
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
                                       builder: (context) => const SignupScreen(),

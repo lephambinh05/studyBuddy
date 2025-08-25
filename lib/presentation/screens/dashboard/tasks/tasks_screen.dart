@@ -7,10 +7,10 @@ class TasksScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Nhiệm vụ'),
+        title: const Text('Tasks'),
       ),
       body: const Center(
-        child: Text('Màn hình nhiệm vụ - Đang phát triển'),
+        child: Text('Tasks screen - Under development'),
       ),
     );
   }

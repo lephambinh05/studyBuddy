@@ -22,11 +22,13 @@ class EmptyState extends StatelessWidget {
     final theme = Theme.of(context);
     
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
             // Icon
             Container(
               width: 80,
@@ -119,6 +121,7 @@ class EmptyState extends StatelessWidget {
               ),
             ],
           ],
+        ),
         ),
       ),
     );

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:studybuddy/core/theme/app_theme.dart';
 import 'package:studybuddy/presentation/widgets/common/gradient_card.dart';
+import 'package:studybuddy/presentation/widgets/event/event_form_dialog.dart';
+import 'package:studybuddy/data/models/event_model.dart';
+import 'package:studybuddy/presentation/providers/event_provider.dart';
 
 class CalendarScreen extends ConsumerStatefulWidget {
   const CalendarScreen({super.key});
@@ -18,7 +21,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
   DateTime _selectedDate = DateTime.now();
   DateTime _focusedDate = DateTime.now();
   
-  final List<String> _weekDays = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+  final List<String> _weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   @override
   void initState() {
@@ -37,6 +40,11 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
     ));
     
     _animationController.forward();
+    
+    // Load events when screen initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(eventProvider.notifier).loadEvents();
+    });
   }
 
   @override
@@ -102,7 +110,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
               ),
               Expanded(
                 child: Text(
-                  'Lịch học tập',
+                  'Calendar',
                   style: theme.textTheme.headlineMedium?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -126,7 +134,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
               Expanded(
                 child: _buildStatCard(
                   context: context,
-                  title: 'Sự kiện hôm nay',
+                  title: 'Today\'s event',
                   value: '3',
                   color: Colors.white,
                 ),
@@ -135,7 +143,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
               Expanded(
                 child: _buildStatCard(
                   context: context,
-                  title: 'Tuần này',
+                  title: 'This week',
                   value: '12',
                   color: Colors.white,
                 ),
@@ -144,7 +152,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
               Expanded(
                 child: _buildStatCard(
                   context: context,
-                  title: 'Tháng này',
+                  title: 'This month',
                   value: '45',
                   color: Colors.white,
                 ),
@@ -333,7 +341,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Sự kiện ngày ${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+            'Event on ${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -346,8 +354,13 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
   }
 
   Widget _buildEventsForSelectedDate(ThemeData theme) {
-    // Sample events data
-    final events = _getEventsForDate(_selectedDate);
+    // Get events from provider
+    final eventState = ref.watch(eventProvider);
+    final events = eventState.events.where((event) {
+      final eventDate = DateTime(event.startTime.year, event.startTime.month, event.startTime.day);
+      final selectedDate = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+      return eventDate.isAtSameMomentAs(selectedDate);
+    }).toList();
     
     if (events.isEmpty) {
       return Center(
@@ -361,14 +374,14 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
             ),
             const SizedBox(height: 16),
             Text(
-              'Không có sự kiện nào',
+              'No event',
               style: theme.textTheme.headlineSmall?.copyWith(
                 color: Colors.grey.shade600,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Hãy thêm sự kiện mới cho ngày này',
+              'Add a new event for today',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: Colors.grey.shade500,
               ),
@@ -379,7 +392,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
                 _showAddEventDialog(context);
               },
               icon: const Icon(Icons.add),
-              label: const Text('Thêm sự kiện'),
+              label: const Text('Add Event'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppThemes.primaryColor,
                 foregroundColor: Colors.white,
@@ -391,21 +404,16 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
     }
     
     return Column(
-      children: events.asMap().entries.map((entry) {
-        final index = entry.key;
-        final event = entry.value;
-        return FadeTransition(
-          opacity: _fadeAnimation,
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: _buildEventCard(event, theme),
-          ),
+      children: events.map((event) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: _buildEventCard(event, theme),
         );
       }).toList(),
     );
   }
 
-  Widget _buildEventCard(Map<String, dynamic> event, ThemeData theme) {
+  Widget _buildEventCard(EventModel event, ThemeData theme) {
     return GlassCard(
       child: Row(
         children: [
@@ -413,7 +421,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
             width: 4,
             height: 60,
             decoration: BoxDecoration(
-              color: _getEventColor(event['type']),
+              color: _getEventColor(event.type),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -423,20 +431,21 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  event['title'],
+                  event.title,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  event['description'],
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey.shade600,
+                if (event.description != null)
+                  Text(
+                    event.description!,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey.shade600,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -447,7 +456,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      event['time'],
+                      '${_formatTime(event.startTime)} - ${_formatTime(event.endTime)}',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: Colors.grey.shade600,
                       ),
@@ -456,13 +465,13 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: _getEventColor(event['type']).withOpacity(0.1),
+                        color: _getEventColor(event.type).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        event['type'],
+                        event.type,
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: _getEventColor(event['type']),
+                          color: _getEventColor(event.type),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -494,7 +503,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
                   children: [
                     Icon(Icons.edit, size: 20),
                     SizedBox(width: 8),
-                    Text('Chỉnh sửa'),
+                    Text('Edit Event'),
                   ],
                 ),
               ),
@@ -504,7 +513,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
                   children: [
                     Icon(Icons.delete, size: 20, color: Colors.red),
                     SizedBox(width: 8),
-                    Text('Xóa', style: TextStyle(color: Colors.red)),
+                    Text('Delete Event', style: TextStyle(color: Colors.red)),
                   ],
                 ),
               ),
@@ -554,8 +563,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
 
   String _getMonthName(int month) {
     const months = [
-      'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
-      'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
     ];
     return months[month - 1];
   }
@@ -567,44 +576,24 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
   }
 
   bool _hasEventsOnDate(DateTime date) {
-    // Sample logic - check if date has events
-    return date.day % 3 == 0; // Every 3rd day has events
+    // Check if date has events from provider
+    final eventState = ref.read(eventProvider);
+    return eventState.events.any((event) {
+      final eventDate = DateTime(event.startTime.year, event.startTime.month, event.startTime.day);
+      final checkDate = DateTime(date.year, date.month, date.day);
+      return eventDate.isAtSameMomentAs(checkDate);
+    });
   }
 
-  List<Map<String, dynamic>> _getEventsForDate(DateTime date) {
-    // Sample events data
-    if (date.day % 3 == 0) {
-      return [
-        {
-          'title': 'Học Toán',
-          'description': 'Làm bài tập chương 3',
-          'time': '09:00 - 10:30',
-          'type': 'Học tập',
-        },
-        {
-          'title': 'Ôn tiếng Anh',
-          'description': 'Học từ vựng Unit 5',
-          'time': '14:00 - 15:00',
-          'type': 'Học tập',
-        },
-        {
-          'title': 'Thể dục',
-          'description': 'Chạy bộ 30 phút',
-          'time': '17:00 - 17:30',
-          'type': 'Thể dục',
-        },
-      ];
-    }
-    return [];
-  }
+
 
   Color _getEventColor(String type) {
     switch (type) {
-      case 'Học tập':
+        case 'Study':
         return AppThemes.primaryColor;
-      case 'Thể dục':
+      case 'Exercise':
         return AppThemes.accentColor;
-      case 'Giải trí':
+      case 'Entertainment':
         return AppThemes.secondaryColor;
       default:
         return AppThemes.warningColor;
@@ -614,101 +603,116 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
   void _showAddEventDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Thêm sự kiện mới'),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Tên sự kiện',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 16),
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Mô tả',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 3,
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Thời gian bắt đầu',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Thời gian kết thúc',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Loại sự kiện',
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
-          ),
-          ElevatedButton(
-            onPressed: () {
+      builder: (context) => EventFormDialog(
+        onSave: (newEvent) async {
+          try {
+            await ref.read(eventProvider.notifier).addEvent(newEvent);
+            if (context.mounted) {
               Navigator.pop(context);
-              // TODO: Save new event
-            },
-            child: const Text('Thêm'),
-          ),
-        ],
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Event "${newEvent.title}" has been added'),
+                  backgroundColor: AppThemes.primaryColor,
+                ),
+              );
+            }
+          } catch (e) {
+            if (context.mounted) {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Cannot add event. Please try again later.'),
+                  backgroundColor: AppThemes.errorColor,
+                ),
+              );
+            }
+          }
+        },
       ),
     );
   }
 
-  void _showEditEventDialog(BuildContext context, Map<String, dynamic> event) {
-    // TODO: Implement edit event dialog
-    Navigator.pop(context);
+  void _showEditEventDialog(BuildContext context, EventModel event) {
+    
+    showDialog(
+      context: context,
+      builder: (context) => EventFormDialog(
+        event: event,
+        onSave: (updatedEvent) async {
+          try {
+            await ref.read(eventProvider.notifier).updateEvent(event.id, updatedEvent);
+            if (context.mounted) {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Event "${updatedEvent.title}" has been updated'),
+                  backgroundColor: AppThemes.primaryColor,
+                ),
+              );
+            }
+          } catch (e) {
+            if (context.mounted) {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Cannot update event. Please try again later.'),
+                  backgroundColor: AppThemes.errorColor,
+                ),
+              );
+            }
+          }
+        },
+      ),
+    );
   }
 
-  void _showDeleteEventConfirmation(BuildContext context, Map<String, dynamic> event) {
+  void _showDeleteEventConfirmation(BuildContext context, EventModel event) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Xác nhận xóa'),
-        content: Text('Bạn có chắc chắn muốn xóa sự kiện "${event['title']}"?'),
+        title: const Text('Confirm delete'),
+        content: Text('Are you sure you want to delete the event "${event.title}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // TODO: Delete event
+            onPressed: () async {
+              try {
+                await ref.read(eventProvider.notifier).deleteEvent(event.id);
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Event "${event.title}" has been deleted'),
+                      backgroundColor: AppThemes.primaryColor,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Cannot delete event. Please try again later.'),
+                      backgroundColor: AppThemes.errorColor,
+                    ),
+                  );
+                }
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppThemes.errorColor,
             ),
-            child: const Text('Xóa'),
+            child: const Text('Delete'),
           ),
         ],
       ),
     );
+  }
+
+  String _formatTime(DateTime time) {
+    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
 } 

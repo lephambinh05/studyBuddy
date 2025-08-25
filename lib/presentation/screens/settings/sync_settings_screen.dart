@@ -29,7 +29,7 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Đồng bộ dữ liệu'),
+        title: const Text('Sync data'),
         backgroundColor: AppThemes.primaryColor,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -55,7 +55,7 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'Trạng thái đồng bộ',
+                          'Sync status',
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -75,7 +75,7 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'Đã kết nối với Firebase',
+                          'Connected to Firebase',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: Colors.green,
                             fontWeight: FontWeight.w600,
@@ -85,7 +85,7 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Dữ liệu được đồng bộ tự động',
+                      'Data is synced automatically',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: Colors.grey.shade600,
                       ),
@@ -99,7 +99,7 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
             
             // Sync Options
             Text(
-              'Tùy chọn đồng bộ',
+              'Sync options',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -112,8 +112,8 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
                   _buildSyncOption(
                     context: context,
                     icon: Icons.sync,
-                    title: 'Tự động đồng bộ',
-                    subtitle: 'Đồng bộ dữ liệu tự động khi có thay đổi',
+                    title: 'Auto sync',
+                    subtitle: 'Sync data automatically when there is a change',
                     value: _autoSync,
                     onChanged: (value) {
                       setState(() {
@@ -125,8 +125,8 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
                   _buildSyncOption(
                     context: context,
                     icon: Icons.wifi,
-                    title: 'Chỉ đồng bộ qua WiFi',
-                    subtitle: 'Tiết kiệm dữ liệu di động',
+                    title: 'Sync only via WiFi',
+                    subtitle: 'Save mobile data',
                     value: _syncOnWifiOnly,
                     onChanged: (value) {
                       setState(() {
@@ -142,7 +142,7 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
             
             // Data Types
             Text(
-              'Loại dữ liệu đồng bộ',
+              'Data types to sync',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -155,8 +155,8 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
                   _buildSyncOption(
                     context: context,
                     icon: Icons.task,
-                    title: 'Bài tập',
-                    subtitle: 'Đồng bộ danh sách bài tập',
+                    title: 'Tasks',
+                    subtitle: 'Sync task list',
                     value: _syncTasks,
                     onChanged: (value) {
                       setState(() {
@@ -168,8 +168,8 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
                   _buildSyncOption(
                     context: context,
                     icon: Icons.book,
-                    title: 'Môn học',
-                    subtitle: 'Đồng bộ danh sách môn học',
+                    title: 'Subjects',
+                    subtitle: 'Sync subject list',
                     value: _syncSubjects,
                     onChanged: (value) {
                       setState(() {
@@ -181,8 +181,8 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
                   _buildSyncOption(
                     context: context,
                     icon: Icons.flag,
-                    title: 'Mục tiêu học tập',
-                    subtitle: 'Đồng bộ mục tiêu học tập',
+                    title: 'Study targets',
+                    subtitle: 'Sync study targets',
                     value: _syncStudyTargets,
                     onChanged: (value) {
                       setState(() {
@@ -198,7 +198,7 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
             
             // Manual Sync
             Text(
-              'Đồng bộ thủ công',
+                  'Manual sync',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -211,8 +211,8 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
                   _buildActionItem(
                     context: context,
                     icon: Icons.sync,
-                    title: 'Đồng bộ ngay',
-                    subtitle: 'Đồng bộ tất cả dữ liệu lên Firebase',
+                    title: 'Sync now',
+                    subtitle: 'Sync all data to Firebase',
                     onTap: _performManualSync,
                     isLoading: _isSyncing,
                   ),
@@ -220,16 +220,16 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
                   _buildActionItem(
                     context: context,
                     icon: Icons.download,
-                    title: 'Tải dữ liệu từ Firebase',
-                    subtitle: 'Tải dữ liệu mới nhất từ cloud',
+                    title: 'Download data from Firebase',
+                    subtitle: 'Download latest data from cloud',
                     onTap: _downloadFromFirebase,
                   ),
                   const Divider(),
                   _buildActionItem(
                     context: context,
                     icon: Icons.upload,
-                    title: 'Tải lên Firebase',
-                    subtitle: 'Tải dữ liệu local lên cloud',
+                    title: 'Upload to Firebase',
+                    subtitle: 'Upload local data to cloud',
                     onTap: _uploadToFirebase,
                   ),
                 ],
@@ -240,7 +240,7 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
             
             // Sync History
             Text(
-              'Lịch sử đồng bộ',
+              'Sync history',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -254,25 +254,25 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
                   children: [
                     _buildSyncHistoryItem(
                       context: context,
-                      title: 'Lần cuối đồng bộ',
+                      title: 'Last sync',
                       value: DateTime.now().toString().substring(0, 16),
-                      status: 'Thành công',
+                      status: 'Success',
                       isSuccess: true,
                     ),
                     const SizedBox(height: 12),
                     _buildSyncHistoryItem(
                       context: context,
-                      title: 'Dữ liệu đã đồng bộ',
-                      value: '${ref.watch(taskProvider).tasks.length} bài tập, ${ref.watch(subjectProvider).subjects.length} môn học, ${ref.watch(studyTargetProvider).activeTargets.length} mục tiêu',
-                      status: 'Hoàn thành',
+                      title: 'Synced data',
+                      value: '${ref.watch(taskProvider).tasks.length} tasks, ${ref.watch(subjectProvider).subjects.length} subjects, ${ref.watch(studyTargetProvider).activeTargets.length} study targets',
+                      status: 'Completed',
                       isSuccess: true,
                     ),
                     const SizedBox(height: 12),
                     _buildSyncHistoryItem(
                       context: context,
-                      title: 'Kích thước dữ liệu',
+                      title: 'Data size',
                       value: '${(ref.watch(taskProvider).tasks.length + ref.watch(subjectProvider).subjects.length + ref.watch(studyTargetProvider).activeTargets.length) * 0.5} KB',
-                      status: 'Đã tối ưu',
+                      status: 'Optimized',
                       isSuccess: true,
                     ),
                   ],
@@ -412,7 +412,7 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
     });
 
     try {
-      print('🔄 SyncSettingsScreen: Bắt đầu đồng bộ thủ công...');
+      print('🔄 SyncSettingsScreen: Start manual sync...');
       
       // Force sync all providers
       await ref.read(studyTargetProvider.notifier).loadStudyTargets();
@@ -423,22 +423,22 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
       final syncService = ref.read(syncServiceProvider.notifier);
       await syncService.forceSync();
       
-      print('✅ SyncSettingsScreen: Đồng bộ thủ công hoàn thành');
+      print('✅ SyncSettingsScreen: Manual sync completed');
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Đồng bộ thành công!'),
+            content: Text('Sync completed!'),
             backgroundColor: Colors.green,
           ),
         );
       }
     } catch (e) {
-      print('❌ SyncSettingsScreen: Lỗi đồng bộ: $e');
+      print('❌ SyncSettingsScreen: Error syncing: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Lỗi đồng bộ: ${e.toString()}'),
+              content: Text('Error syncing: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -454,29 +454,29 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
 
   Future<void> _downloadFromFirebase() async {
     try {
-      print('🔄 SyncSettingsScreen: Bắt đầu tải dữ liệu từ Firebase...');
+      print('🔄 SyncSettingsScreen: Start downloading data from Firebase...');
       
       // Load data from Firebase for all providers
       await ref.read(studyTargetProvider.notifier).loadStudyTargets();
       await ref.read(taskProvider.notifier).loadTasks();
       await ref.read(subjectProvider.notifier).loadSubjects();
       
-      print('✅ SyncSettingsScreen: Tải dữ liệu từ Firebase thành công');
+      print('✅ SyncSettingsScreen: Download data from Firebase successfully');
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Đã tải dữ liệu từ Firebase!'),
+            content: Text('Download data from Firebase successfully!'),
             backgroundColor: Colors.green,
           ),
         );
       }
     } catch (e) {
-      print('❌ SyncSettingsScreen: Lỗi tải dữ liệu: $e');
+      print('❌ SyncSettingsScreen: Error downloading data: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Lỗi tải dữ liệu: ${e.toString()}'),
+            content: Text('Error downloading data: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -486,7 +486,7 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
 
   Future<void> _uploadToFirebase() async {
     try {
-      print('🔄 SyncSettingsScreen: Bắt đầu tải dữ liệu lên Firebase...');
+      print('🔄 SyncSettingsScreen: Start uploading data to Firebase...');
       
       // Force sync all pending data
       final syncService = ref.read(syncServiceProvider.notifier);
@@ -497,22 +497,22 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
       await ref.read(taskProvider.notifier).loadTasks();
       await ref.read(subjectProvider.notifier).loadSubjects();
       
-      print('✅ SyncSettingsScreen: Tải dữ liệu lên Firebase thành công');
+      print('✅ SyncSettingsScreen: Upload data to Firebase successfully');
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Đã tải dữ liệu lên Firebase!'),
+            content: Text('Upload data to Firebase successfully!'),
             backgroundColor: Colors.green,
           ),
         );
       }
     } catch (e) {
-      print('❌ SyncSettingsScreen: Lỗi tải lên: $e');
+      print('❌ SyncSettingsScreen: Error uploading data: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Lỗi tải lên: ${e.toString()}'),
+            content: Text('Error uploading data: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );

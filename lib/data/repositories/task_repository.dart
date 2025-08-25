@@ -12,65 +12,15 @@ class TaskRepository {
   // Lấy current user ID
   String? get _currentUserId => _auth.currentUser?.uid;
 
-  // Mock data cho testing (chỉ dùng khi không có user)
-  List<TaskModel> _mockTasks = [
-    TaskModel(
-      id: '1',
-      title: 'Làm bài tập Toán chương 3',
-      description: 'Hoàn thành các bài tập từ trang 45-50',
-      subject: 'Toán',
-      deadline: DateTime.now().add(const Duration(days: 2)),
-      isCompleted: false,
-      priority: 2,
-      createdAt: DateTime.now().subtract(const Duration(days: 1)),
-    ),
-    TaskModel(
-      id: '2',
-      title: 'Ôn tập từ vựng tiếng Anh',
-      description: 'Học 50 từ mới trong Unit 5',
-      subject: 'Anh',
-      deadline: DateTime.now().add(const Duration(days: 1)),
-      isCompleted: true,
-      priority: 1,
-      createdAt: DateTime.now().subtract(const Duration(days: 2)),
-      completedAt: DateTime.now().subtract(const Duration(hours: 2)),
-    ),
-    TaskModel(
-      id: '3',
-      title: 'Đọc sách Văn học',
-      description: 'Đọc và phân tích tác phẩm "Truyện Kiều"',
-      subject: 'Văn',
-      deadline: DateTime.now().add(const Duration(days: 3)),
-      isCompleted: false,
-      priority: 3,
-      createdAt: DateTime.now().subtract(const Duration(days: 3)),
-    ),
-    TaskModel(
-      id: '4',
-      title: 'Làm thí nghiệm Hóa học',
-      description: 'Thực hành thí nghiệm về phản ứng oxi hóa khử',
-      subject: 'Hóa',
-      deadline: DateTime.now().subtract(const Duration(days: 1)),
-      isCompleted: false,
-      priority: 1,
-      createdAt: DateTime.now().subtract(const Duration(days: 4)),
-    ),
-    TaskModel(
-      id: '5',
-      title: 'Học lý thuyết Vật lý',
-      description: 'Ôn tập chương điện học và từ học',
-      subject: 'Lý',
-      deadline: DateTime.now().add(const Duration(days: 5)),
-      isCompleted: false,
-      priority: 2,
-      createdAt: DateTime.now().subtract(const Duration(days: 5)),
-    ),
-  ];
+
 
   // Lấy tất cả bài tập của user hiện tại
   Future<List<TaskModel>> getAllTasks() async {
     final userId = _currentUserId;
-    if (userId == null) return [];
+    if (userId == null) {
+      print('⚠️ TaskRepository: Không có user đăng nhập, trả về danh sách rỗng');
+      return [];
+    }
 
     try {
       print('🔄 TaskRepository: Bắt đầu getAllTasks()');
@@ -120,8 +70,8 @@ class TaskRepository {
   }) async {
     final userId = _currentUserId;
     if (userId == null) {
-      print('⚠️ TaskRepository: Không có user đăng nhập, trả về mock data');
-      return _mockTasks;
+      print('⚠️ TaskRepository: Không có user đăng nhập, trả về danh sách rỗng');
+      return [];
     }
     
     try {
@@ -164,12 +114,8 @@ class TaskRepository {
   Future<TaskModel?> getTaskById(String taskId) async {
     final userId = _currentUserId;
     if (userId == null) {
-      print('⚠️ TaskRepository: Không có user đăng nhập, tìm trong mock data');
-      try {
-        return _mockTasks.firstWhere((task) => task.id == taskId);
-      } catch (e) {
-        return null;
-      }
+      print('⚠️ TaskRepository: Không có user đăng nhập, không thể lấy task');
+      return null;
     }
     
     try {
@@ -383,8 +329,8 @@ class TaskRepository {
   Future<Map<String, dynamic>> getTaskStatistics() async {
     final userId = _currentUserId;
     if (userId == null) {
-      print('⚠️ TaskRepository: Không có user đăng nhập, tính toán từ mock data');
-      return _calculateStatistics(_mockTasks);
+      print('⚠️ TaskRepository: Không có user đăng nhập, trả về thống kê rỗng');
+      return _calculateStatistics([]);
     }
     
     try {

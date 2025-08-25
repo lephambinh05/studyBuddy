@@ -9,38 +9,15 @@ class EventRepository {
 
   String? get _currentUserId => _auth.currentUser?.uid;
 
-  // Mock data cho testing
-  List<EventModel> _mockEvents = [
-    EventModel(
-      id: '1',
-      title: 'Học Toán',
-      description: 'Ôn tập chương 3',
-      startTime: DateTime.now().add(const Duration(hours: 2)),
-      endTime: DateTime.now().add(const Duration(hours: 4)),
-      type: 'study',
-      subject: 'Toán',
-      location: 'Thư viện',
-      isAllDay: false,
-      color: '#FF6B6B',
-    ),
-    EventModel(
-      id: '2',
-      title: 'Kiểm tra Văn',
-      description: 'Kiểm tra 15 phút',
-      startTime: DateTime.now().add(const Duration(days: 1, hours: 8)),
-      endTime: DateTime.now().add(const Duration(days: 1, hours: 8, minutes: 15)),
-      type: 'exam',
-      subject: 'Văn',
-      location: 'Lớp 12A1',
-      isAllDay: false,
-      color: '#4ECDC4',
-    ),
-  ];
+
 
   // Lấy tất cả events
   Future<List<EventModel>> getAllEvents() async {
     final userId = _currentUserId;
-    if (userId == null) return [];
+    if (userId == null) {
+      print('⚠️ EventRepository: Không có user đăng nhập, trả về danh sách rỗng');
+      return [];
+    }
 
     try {
       print('🔄 EventRepository: Bắt đầu getAllEvents()');
@@ -83,12 +60,19 @@ class EventRepository {
 
   // Lấy events theo tháng
   Future<List<EventModel>> getEventsByMonth(DateTime month) async {
+    final userId = _currentUserId;
+    if (userId == null) {
+      print('⚠️ EventRepository: Không có user đăng nhập, trả về danh sách rỗng');
+      return [];
+    }
+    
     try {
       final startOfMonth = DateTime(month.year, month.month, 1);
       final endOfMonth = DateTime(month.year, month.month + 1, 0, 23, 59, 59);
 
       final querySnapshot = await _firestore
           .collection('events')
+          .where('userId', isEqualTo: userId)
           .where('startTime', isGreaterThanOrEqualTo: startOfMonth)
           .where('startTime', isLessThanOrEqualTo: endOfMonth)
           .orderBy('startTime')
@@ -104,22 +88,26 @@ class EventRepository {
           })
           .toList();
     } catch (e) {
-      // Filter mock data by month
-      return _mockEvents.where((event) {
-        return event.startTime.isAfter(DateTime(month.year, month.month, 1)) &&
-               event.startTime.isBefore(DateTime(month.year, month.month + 1, 0));
-      }).toList();
+      print('❌ EventRepository: Firebase error: $e, returning empty list');
+      return [];
     }
   }
 
   // Lấy events theo ngày
   Future<List<EventModel>> getEventsByDate(DateTime date) async {
+    final userId = _currentUserId;
+    if (userId == null) {
+      print('⚠️ EventRepository: Không có user đăng nhập, trả về danh sách rỗng');
+      return [];
+    }
+    
     try {
       final startOfDay = DateTime(date.year, date.month, date.day);
       final endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
 
       final querySnapshot = await _firestore
           .collection('events')
+          .where('userId', isEqualTo: userId)
           .where('startTime', isGreaterThanOrEqualTo: startOfDay)
           .where('startTime', isLessThanOrEqualTo: endOfDay)
           .orderBy('startTime')
@@ -135,33 +123,39 @@ class EventRepository {
           })
           .toList();
     } catch (e) {
-      // Filter mock data by date
-      return _mockEvents.where((event) {
-        return event.startTime.isAfter(DateTime(date.year, date.month, date.day)) &&
-               event.startTime.isBefore(DateTime(date.year, date.month, date.day + 1));
-      }).toList();
+      print('❌ EventRepository: Firebase error: $e, returning empty list');
+      return [];
     }
   }
 
   // Lấy event theo ID
   Future<EventModel?> getEventById(String eventId) async {
+    final userId = _currentUserId;
+    if (userId == null) {
+      print('⚠️ EventRepository: Không có user đăng nhập, không thể lấy event');
+      return null;
+    }
+    
     try {
       final doc = await _firestore.collection('events').doc(eventId).get();
       
       if (doc.exists) {
         final data = doc.data() as Map<String, dynamic>;
-        return EventModel.fromJson({
-          'id': doc.id,
-          ...data,
-        });
+        // Kiểm tra xem event có thuộc về user hiện tại không
+        if (data['userId'] == userId) {
+          return EventModel.fromJson({
+            'id': doc.id,
+            ...data,
+          });
+        } else {
+          print('⚠️ EventRepository: Event không thuộc về user hiện tại');
+          return null;
+        }
       }
       return null;
     } catch (e) {
-      try {
-        return _mockEvents.firstWhere((event) => event.id == eventId);
-      } catch (e) {
-        return null;
-      }
+      print('❌ EventRepository: Firebase error: $e');
+      return null;
     }
   }
 
@@ -250,9 +244,16 @@ class EventRepository {
 
   // Lấy events theo type
   Future<List<EventModel>> getEventsByType(String type) async {
+    final userId = _currentUserId;
+    if (userId == null) {
+      print('⚠️ EventRepository: Không có user đăng nhập, trả về danh sách rỗng');
+      return [];
+    }
+    
     try {
       final querySnapshot = await _firestore
           .collection('events')
+          .where('userId', isEqualTo: userId)
           .where('type', isEqualTo: type)
           .orderBy('startTime')
           .get();
@@ -267,18 +268,26 @@ class EventRepository {
           })
           .toList();
     } catch (e) {
-      return _mockEvents.where((event) => event.type == type).toList();
+      print('❌ EventRepository: Firebase error: $e, returning empty list');
+      return [];
     }
   }
 
   // Lấy upcoming events
   Future<List<EventModel>> getUpcomingEvents({int days = 7}) async {
+    final userId = _currentUserId;
+    if (userId == null) {
+      print('⚠️ EventRepository: Không có user đăng nhập, trả về danh sách rỗng');
+      return [];
+    }
+    
     try {
       final now = DateTime.now();
       final endDate = now.add(Duration(days: days));
 
       final querySnapshot = await _firestore
           .collection('events')
+          .where('userId', isEqualTo: userId)
           .where('startTime', isGreaterThanOrEqualTo: now)
           .where('startTime', isLessThanOrEqualTo: endDate)
           .orderBy('startTime')
@@ -294,18 +303,24 @@ class EventRepository {
           })
           .toList();
     } catch (e) {
-      final now = DateTime.now();
-      final endDate = now.add(Duration(days: days));
-      return _mockEvents.where((event) => 
-        event.startTime.isAfter(now) && event.startTime.isBefore(endDate)
-      ).toList();
+      print('❌ EventRepository: Firebase error: $e, returning empty list');
+      return [];
     }
   }
 
   // Lấy thống kê events
   Future<Map<String, dynamic>> getEventStatistics() async {
+    final userId = _currentUserId;
+    if (userId == null) {
+      print('⚠️ EventRepository: Không có user đăng nhập, trả về thống kê rỗng');
+      return _calculateEventStatistics([]);
+    }
+    
     try {
-      final querySnapshot = await _firestore.collection('events').get();
+      final querySnapshot = await _firestore
+          .collection('events')
+          .where('userId', isEqualTo: userId)
+          .get();
       final events = querySnapshot.docs
           .map((doc) {
             final data = doc.data() as Map<String, dynamic>;
@@ -318,7 +333,8 @@ class EventRepository {
 
       return _calculateEventStatistics(events);
     } catch (e) {
-      return _calculateEventStatistics(_mockEvents);
+      print('❌ EventRepository: Firebase error: $e, returning empty statistics');
+      return _calculateEventStatistics([]);
     }
   }
 

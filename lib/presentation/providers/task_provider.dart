@@ -41,7 +41,7 @@ class TaskState {
 // Task provider
 final taskProvider = StateNotifierProvider<TaskNotifier, TaskState>((ref) {
   final repository = ref.watch(taskRepositoryProvider);
-  return TaskNotifier(repository);
+  return TaskNotifier(repository, ref);
 });
 
 // Provider để lắng nghe auth state changes
@@ -52,25 +52,45 @@ final authStateProvider = Provider<AuthStatus>((ref) {
 // Task provider
 class TaskNotifier extends StateNotifier<TaskState> {
   final TaskRepository _repository;
+  final Ref _ref;
 
-  TaskNotifier(this._repository) : super(const TaskState());
+  TaskNotifier(this._repository, this._ref) : super(const TaskState());
 
   // Load tasks
   Future<void> loadTasks() async {
-    print('🔄 TaskProvider: Bắt đầu load tasks...');
+    print('🔄 TaskProvider: Starting to load tasks...');
     state = state.copyWith(isLoading: true, error: null);
     
     try {
-      print('📡 TaskProvider: Gọi repository.getAllTasks()...');
+      // Kiểm tra xem có user đăng nhập không
+      final authState = _ref.read(authNotifierProvider);
+      if (authState.status != AuthStatus.authenticated) {
+        print('⚠️ TaskProvider: User not authenticated, skipping task load');
+        state = state.copyWith(
+          tasks: [],
+          statistics: {
+            'totalTasks': 0,
+            'completedTasks': 0,
+            'pendingTasks': 0,
+            'overdueTasks': 0,
+            'completionRate': 0.0,
+          },
+          isLoading: false,
+          error: null,
+        );
+        return;
+      }
+      
+      print('📡 TaskProvider: Calling repository.getAllTasks()...');
       final tasks = await _repository.getAllTasks();
-      print('✅ TaskProvider: Repository trả về ${tasks.length} tasks');
+      print('✅ TaskProvider: Repository returned ${tasks.length} tasks');
       
       // Debug: In ra trạng thái của từng task
       for (final task in tasks) {
         print('📋 TaskProvider: Task "${task.title}" (ID: ${task.id}): isCompleted = ${task.isCompleted}');
       }
       
-      print('📊 TaskProvider: Gọi repository.getTaskStatistics()...');
+      print('📊 TaskProvider: Calling repository.getTaskStatistics()...');
       final statistics = await _repository.getTaskStatistics();
       print('✅ TaskProvider: Statistics: $statistics');
       
@@ -87,9 +107,9 @@ class TaskNotifier extends StateNotifier<TaskState> {
         isLoading: false,
         error: null,
       );
-      print('✅ TaskProvider: Cập nhật state thành công. Tasks: ${tasks.length}');
+      print('✅ TaskProvider: Updated state successfully. Tasks: ${tasks.length}');
     } catch (e) {
-      print('❌ TaskProvider: Lỗi load tasks: $e');
+      print('❌ TaskProvider: Error loading tasks: $e');
       state = state.copyWith(
         tasks: [],
         statistics: {
@@ -125,7 +145,7 @@ class TaskNotifier extends StateNotifier<TaskState> {
         isLoading: false,
       );
     } catch (e) {
-      print('❌ Lỗi load tasks với filter: $e');
+      print('❌ TaskProvider: Error loading tasks with filter: $e');
       state = state.copyWith(
         tasks: [], // Empty list thay vì mock data
         isLoading: false,
@@ -140,7 +160,7 @@ class TaskNotifier extends StateNotifier<TaskState> {
       await _repository.addTask(task);
       await loadTasks(); // Reload để cập nhật UI
     } catch (e) {
-      print('❌ Lỗi thêm task: $e');
+      print('❌ TaskProvider: Error adding task: $e');
       state = state.copyWith(error: e.toString());
       // Re-throw để UI có thể hiển thị thông báo
       rethrow;
@@ -153,7 +173,7 @@ class TaskNotifier extends StateNotifier<TaskState> {
       await _repository.updateTask(taskId, task);
       await loadTasks(); // Reload để cập nhật UI
     } catch (e) {
-      print('❌ Lỗi cập nhật task: $e');
+      print('❌ TaskProvider: Error updating task: $e');
       state = state.copyWith(error: e.toString());
       rethrow;
     }
@@ -165,7 +185,7 @@ class TaskNotifier extends StateNotifier<TaskState> {
       await _repository.deleteTask(taskId);
       await loadTasks(); // Reload để cập nhật UI
     } catch (e) {
-      print('❌ Lỗi xóa task: $e');
+      print('❌ TaskProvider: Error deleting task: $e');
       state = state.copyWith(error: e.toString());
       rethrow;
     }
@@ -173,7 +193,7 @@ class TaskNotifier extends StateNotifier<TaskState> {
 
   // Toggle completion status
   Future<void> toggleTaskCompletion(String taskId, bool isCompleted) async {
-    print('🔄 TaskProvider: Bắt đầu toggle task completion');
+    print('🔄 TaskProvider: Starting to toggle task completion');
     print('📋 TaskProvider: TaskID: $taskId, isCompleted: $isCompleted');
 
     try {
@@ -187,15 +207,15 @@ class TaskNotifier extends StateNotifier<TaskState> {
       }
       
       await _repository.toggleTaskCompletion(taskId, isCompleted);
-      print('✅ TaskProvider: Repository toggle thành công!');
+      print('✅ TaskProvider: Repository toggled successfully!');
 
-      print('🔄 TaskProvider: Reload tasks để cập nhật UI...');
+      print('🔄 TaskProvider: Reload tasks to update UI...');
       await loadTasks(); // Reload để cập nhật UI
-      print('✅ TaskProvider: Reload tasks thành công!');
+      print('✅ TaskProvider: Reload tasks successfully!');
       
       // Debug: Kiểm tra task sau khi toggle
       final currentTasks = state.tasks;
-      print('📊 TaskProvider: Tổng số tasks sau reload: ${currentTasks.length}');
+      print('📊 TaskProvider: Total tasks after reload: ${currentTasks.length}');
       
       final updatedTask = currentTasks.firstWhere(
         (task) => task.id == taskId,
@@ -209,14 +229,14 @@ class TaskNotifier extends StateNotifier<TaskState> {
       
       // Kiểm tra xem toggle có thành công không
       if (updatedTask.isCompleted == isCompleted) {
-        print('✅ TaskProvider: Toggle thành công! isCompleted đã được cập nhật đúng');
+        print('✅ TaskProvider: Toggle completed successfully! isCompleted has been updated correctly');
       } else {
-        print('❌ TaskProvider: Toggle thất bại!');
+        print('❌ TaskProvider: Toggle failed!');
         print('📊 TaskProvider: Expected isCompleted: $isCompleted');
         print('📊 TaskProvider: Actual isCompleted: ${updatedTask.isCompleted}');
       }
     } catch (e) {
-      print('❌ TaskProvider: Lỗi toggle task completion: $e');
+      print('❌ TaskProvider: Error toggling task completion: $e');
       print('📊 TaskProvider: Stack trace: ${StackTrace.current}');
       state = state.copyWith(error: e.toString());
       // Re-throw để UI có thể hiển thị thông báo
@@ -320,17 +340,17 @@ class TaskNotifier extends StateNotifier<TaskState> {
   // Sync dữ liệu từ local storage lên Firebase
   Future<void> syncLocalToFirebase() async {
     try {
-      print('🔄 TaskNotifier: Bắt đầu sync local to Firebase...');
+      print('🔄 TaskNotifier: Starting sync local to Firebase...');
       await _repository.syncLocalToFirebase();
       
-      // Reload tasks sau khi sync
+      // Reload tasks after sync
       await loadTasks();
       
-      print('✅ TaskNotifier: Hoàn thành sync local to Firebase');
+      print('✅ TaskNotifier: Sync local to Firebase completed');
     } catch (e) {
-      print('❌ TaskNotifier: Lỗi khi sync local to Firebase: $e');
+      print('❌ TaskNotifier: Error syncing local to Firebase: $e');
       state = state.copyWith(
-        error: 'Không thể đồng bộ dữ liệu: $e',
+        error: 'Cannot sync data: $e',
       );
     }
   }
